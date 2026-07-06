@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local/reverse-design-system.schema.json",
+  "title": "Reverse Design System Extraction",
+  "type": "object",
+  "required": ["version", "source", "tokens", "components", "assets", "stats"],
+  "properties": {
+    "version": { "type": "string" },
+    "source": {
+      "type": "object",
+      "required": ["url", "hostname", "title", "capturedAt", "viewport"],
+      "properties": {
+        "url": { "type": "string" },
+        "hostname": { "type": "string" },
+        "title": { "type": "string" },
+        "capturedAt": { "type": "string" },
+        "captureStateLabel": { "type": "string" },
+        "viewport": {
+          "type": "object",
+          "required": ["width", "height"],
+          "properties": {
+            "width": { "type": "number" },
+            "height": { "type": "number" }
+          }
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "required": ["colors", "typography", "radii", "shadows", "spacing"],
+      "properties": {
+        "colors": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/colorToken" }
+        },
+        "typography": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/typeToken" }
+        },
+        "radii": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/numberToken" }
+        },
+        "shadows": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stringToken" }
+        },
+        "spacing": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/numberToken" }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/component" }
+    },
+    "containers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/container" }
+    },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "stats": { "type": "object" },
+    "pageSnapshot": { "$ref": "#/$defs/pageSnapshot" }
+  },
+  "$defs": {
+    "pageSnapshot": {
+      "type": "object",
+      "required": ["version", "scope", "viewport", "documentSize", "scroll", "nodes"],
+      "properties": {
+        "version": { "type": "string" },
+        "scope": { "type": "string", "enum": ["viewport", "full-page"] },
+        "viewport": { "type": "object" },
+        "documentSize": { "type": "object" },
+        "scroll": { "type": "object" },
+        "nodes": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "visualReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/visualReference" }
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "visualReference": {
+      "type": "object",
+      "required": ["kind", "dataUrl", "bounds"],
+      "properties": {
+        "kind": { "type": "string" },
+        "format": { "type": "string" },
+        "dataUrl": { "type": "string" },
+        "bounds": { "type": "object" },
+        "scroll": { "type": "object" },
+        "devicePixelRatio": { "type": "number" }
+      }
+    },
+    "colorToken": {
+      "type": "object",
+      "required": ["name", "value", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "count": { "type": "number" },
+        "usage": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "typeToken": {
+      "type": "object",
+      "required": ["name", "fontFamily", "fontSize", "fontWeight", "lineHeight", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "fontFamily": { "type": "string" },
+        "fontSize": { "type": "number" },
+        "fontWeight": { "type": "string" },
+        "lineHeight": { "type": "number" },
+        "letterSpacing": { "type": "number" },
+        "count": { "type": "number" }
+      }
+    },
+    "numberToken": {
+      "type": "object",
+      "required": ["name", "value", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "number" },
+        "count": { "type": "number" }
+      }
+    },
+    "stringToken": {
+      "type": "object",
+      "required": ["name", "value", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "count": { "type": "number" }
+      }
+    },
+    "component": {
+      "type": "object",
+      "required": ["id", "name", "category", "signature", "count", "states", "examples"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "signature": { "type": "string" },
+        "count": { "type": "number" },
+        "states": { "type": "array", "items": { "type": "string" } },
+        "assetRefs": { "type": "array", "items": { "type": "object" } },
+        "examples": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": ["type", "src", "count"],
+      "properties": {
+        "type": { "type": "string" },
+        "src": { "type": "string" },
+        "alt": { "type": "string" },
+        "count": { "type": "number" },
+        "signature": { "type": "string" },
+        "assetKind": { "type": "string" },
+        "spriteId": { "type": "string" },
+        "originalHref": { "type": "string" },
+        "resolution": { "type": "string" },
+        "cssProperty": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "container": {
+      "type": "object",
+      "required": ["id", "type", "name", "count", "examples"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "name": { "type": "string" },
+        "tag": { "type": "string" },
+        "role": { "type": "string" },
+        "className": { "type": "string" },
+        "count": { "type": "number" },
+        "examples": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  }
+}

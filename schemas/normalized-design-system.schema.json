@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local/normalized-reverse-design-system.schema.json",
+  "title": "Normalized Reverse Design System",
+  "type": "object",
+  "required": ["normalizedVersion", "source", "semanticTokens", "componentModel", "trace"],
+  "properties": {
+    "normalizedVersion": { "type": "string" },
+    "source": { "type": "object" },
+    "sources": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "semanticTokens": {
+      "type": "object",
+      "required": ["colors", "typography", "spacing", "radii", "shadows"],
+      "properties": {
+        "colors": { "type": "array", "items": { "$ref": "#/$defs/semanticColor" } },
+        "typography": { "type": "array", "items": { "$ref": "#/$defs/semanticType" } },
+        "spacing": { "type": "array", "items": { "$ref": "#/$defs/semanticNumber" } },
+        "radii": { "type": "array", "items": { "$ref": "#/$defs/semanticNumber" } },
+        "shadows": { "type": "array", "items": { "$ref": "#/$defs/semanticString" } }
+      }
+    },
+    "primitiveColorModel": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/primitiveColorGroup" }
+    },
+    "semanticColorModel": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/semanticColorGroup" }
+    },
+    "interactiveColorModel": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/interactiveColorGroup" }
+    },
+    "componentModel": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/semanticComponent" }
+    },
+    "containerModel": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/containerModel" }
+    },
+    "assetCatalog": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "pageSnapshots": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/normalizedPageSnapshot" }
+    },
+    "designSystemSpec": { "type": "object" },
+    "trace": {
+      "type": "object",
+      "required": ["rawVersion", "rawStats"],
+      "properties": {
+        "rawVersion": { "type": "string" },
+        "assetPipelineVersion": { "type": "string" },
+        "rawStats": { "type": "object" },
+        "sourcePages": { "type": "array", "items": { "type": "object" } },
+        "assetCatalogStats": {
+          "type": "object",
+          "properties": {
+            "pipelineVersion": { "type": "string" },
+            "total": { "type": "number" },
+            "unique": { "type": "number" },
+            "kept": { "type": "number" },
+            "omitted": { "type": "number" },
+            "limit": { "oneOf": [{ "type": "number" }, { "type": "string" }] },
+            "componentLinked": { "type": "number" },
+            "multicolorSvg": { "type": "number" },
+            "inlineSvg": { "type": "number" },
+            "monochromeSvg": { "type": "number" },
+            "imageIcons": { "type": "number" },
+            "images": { "type": "number" },
+            "unresolvedIconClues": { "type": "number" },
+            "duplicatesMerged": { "type": "number" }
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "sourceComponentId": { "type": "string" },
+          "componentName": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "normalizedPageSnapshot": {
+      "type": "object",
+      "required": ["sourcePageId", "captureStateLabel", "snapshot"],
+      "properties": {
+        "sourcePageId": { "type": "string" },
+        "sourceUrl": { "type": "string" },
+        "sourceTitle": { "type": "string" },
+        "captureStateLabel": { "type": "string" },
+        "snapshot": { "$ref": "#/$defs/pageSnapshot" }
+      }
+    },
+    "pageSnapshot": {
+      "type": "object",
+      "required": ["version", "scope", "viewport", "documentSize", "scroll", "nodes"],
+      "properties": {
+        "version": { "type": "string" },
+        "scope": { "type": "string", "enum": ["viewport", "full-page"] },
+        "viewport": { "type": "object" },
+        "documentSize": { "type": "object" },
+        "scroll": { "type": "object" },
+        "nodes": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "visualReferences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/visualReference" }
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "visualReference": {
+      "type": "object",
+      "required": ["kind", "dataUrl", "bounds"],
+      "properties": {
+        "kind": { "type": "string" },
+        "format": { "type": "string" },
+        "dataUrl": { "type": "string" },
+        "bounds": { "type": "object" },
+        "scroll": { "type": "object" },
+        "devicePixelRatio": { "type": "number" }
+      }
+    },
+    "semanticColor": {
+      "type": "object",
+      "required": ["name", "value", "aliases", "role", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "role": { "type": "string" },
+        "primitiveFamily": { "type": "string" },
+        "primitiveScale": { "type": "string" },
+        "semanticGroup": { "type": "string" },
+        "semanticContext": { "type": "string" },
+        "semanticState": { "type": "string" },
+        "semanticStateSource": { "type": "string" },
+        "interactiveGroup": { "type": "string" },
+        "interactiveState": { "type": "string" },
+        "interactiveStateSource": { "type": "string" },
+        "interactiveStateObserved": { "type": "boolean" },
+        "origin": { "type": "string" },
+        "count": { "type": "number" },
+        "sourceValue": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "rationale": { "type": "string" }
+      }
+    },
+    "primitiveColorGroup": {
+      "type": "object",
+      "required": ["family", "colors"],
+      "properties": {
+        "family": { "type": "string" },
+        "colors": { "type": "array", "items": { "$ref": "#/$defs/colorModelToken" } }
+      }
+    },
+    "semanticColorGroup": {
+      "type": "object",
+      "required": ["group", "tokens"],
+      "properties": {
+        "group": { "type": "string" },
+        "tokens": { "type": "array", "items": { "$ref": "#/$defs/colorModelToken" } }
+      }
+    },
+    "interactiveColorGroup": {
+      "type": "object",
+      "required": ["group", "states"],
+      "properties": {
+        "group": { "type": "string" },
+        "states": { "type": "array", "items": { "$ref": "#/$defs/colorModelToken" } }
+      }
+    },
+    "colorModelToken": {
+      "type": "object",
+      "required": ["name", "value", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "value": { "type": "string" },
+        "sourceValue": { "type": "string" },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "count": { "type": "number" },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "rationale": { "type": "string" },
+        "origin": { "type": "string" },
+        "scale": { "type": "string" },
+        "context": { "type": "string" },
+        "state": { "type": "string" },
+        "stateSource": { "type": "string" }
+      }
+    },
+    "semanticType": {
+      "type": "object",
+      "required": ["name", "fontFamily", "fontSize", "fontWeight", "lineHeight", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "fontFamily": { "type": "string" },
+        "fontSize": { "type": "number" },
+        "fontWeight": { "type": "string" },
+        "lineHeight": { "type": "number" },
+        "letterSpacing": { "type": "number" },
+        "count": { "type": "number" },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "sourceValue": { "type": "string" },
+        "sourceValues": { "type": "array", "items": { "type": "string" } },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "rationale": { "type": "string" }
+      }
+    },
+    "semanticNumber": {
+      "type": "object",
+      "required": ["name", "value", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "number" },
+        "count": { "type": "number" },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "sourceValue": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "rationale": { "type": "string" }
+      }
+    },
+    "semanticString": {
+      "type": "object",
+      "required": ["name", "value", "count"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "count": { "type": "number" },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "sourceValue": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "rationale": { "type": "string" }
+      }
+    },
+    "semanticComponent": {
+      "type": "object",
+      "required": ["name", "category", "variants", "sourceComponentIds", "examples"],
+      "properties": {
+        "name": { "type": "string" },
+        "displayName": { "type": "string" },
+        "semanticName": { "type": "string" },
+        "namingRationale": { "type": "string" },
+        "category": { "type": "string" },
+        "variants": { "type": "object" },
+        "sourceComponentIds": { "type": "array", "items": { "type": "string" } },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "slots": { "type": "array", "items": { "type": "string" } },
+        "assetRefs": { "type": "array", "items": { "type": "object" } },
+        "assets": { "type": "array", "items": { "$ref": "#/$defs/asset" } },
+        "examples": { "type": "array", "items": { "type": "object" } },
+        "confidence": { "type": "number" },
+        "needsReview": { "type": "boolean" },
+        "reviewStatus": { "type": "string" },
+        "reviewChecklist": { "type": "array", "items": { "type": "object" } },
+        "componentTokens": { "type": "object" },
+        "spec": { "type": "object" },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "stateSources": { "type": "object" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": ["id", "name", "type", "src", "count"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "src": { "type": "string" },
+        "alt": { "type": "string" },
+        "count": { "type": "number" },
+        "spriteId": { "type": "string" },
+        "originalHref": { "type": "string" },
+        "resolution": { "type": "string" },
+        "cssProperty": { "type": "string" },
+        "signature": { "type": "string" },
+        "assetKind": { "type": "string" },
+        "renderPriority": { "type": "number" },
+        "sourcePageIds": { "type": "array", "items": { "type": "string" } },
+        "captureStateLabels": { "type": "array", "items": { "type": "string" } },
+        "linkedComponentIds": { "type": "array", "items": { "type": "string" } },
+        "sources": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "containerModel": {
+      "type": "object",
+      "required": ["name", "type", "examples"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "sourceContainerIds": { "type": "array", "items": { "type": "string" } },
+        "sources": { "type": "array", "items": { "type": "object" } },
+        "examples": { "type": "array", "items": { "type": "object" } },
+        "childSummary": { "type": "object" },
+        "count": { "type": "number" },
+        "confidence": { "type": "number" },
+        "needsReview": { "type": "boolean" },
+        "rationale": { "type": "string" }
+      }
+    }
+  }
+}

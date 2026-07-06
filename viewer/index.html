@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reverse Design System Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <h1>Reverse DS</h1>
+            <p id="source">No file loaded</p>
+          </div>
+        </div>
+
+        <label class="dropzone" for="file">
+          <span>Load JSON</span>
+          <input id="file" type="file" accept="application/json">
+        </label>
+
+        <textarea id="json" spellcheck="false" placeholder="Paste design-system JSON"></textarea>
+        <button id="render">Render preview</button>
+        <div id="status"></div>
+      </aside>
+
+      <section class="content">
+        <header class="toolbar">
+          <nav class="tabs" aria-label="Preview sections">
+            <button class="tab active" data-tab="colors">Colors</button>
+            <button class="tab" data-tab="type">Type</button>
+            <button class="tab" data-tab="tokens">Tokens</button>
+            <button class="tab" data-tab="components">Components</button>
+          </nav>
+          <div class="metrics" id="metrics"></div>
+        </header>
+
+        <section class="panel active" id="colors"></section>
+        <section class="panel" id="type"></section>
+        <section class="panel" id="tokens"></section>
+        <section class="panel" id="components"></section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+

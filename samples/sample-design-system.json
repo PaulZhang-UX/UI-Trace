@@ -1,0 +1,72 @@
+{
+  "version": "0.1.0",
+  "source": {
+    "url": "https://example.com",
+    "hostname": "example.com",
+    "title": "Example Product",
+    "capturedAt": "2026-05-08T00:00:00.000Z",
+    "viewport": { "width": 1440, "height": 900 }
+  },
+  "tokens": {
+    "colors": [
+      { "name": "color/1-111111", "value": "#111111", "count": 80, "usage": ["color", "backgroundColor"] },
+      { "name": "color/2-ffffff", "value": "#ffffff", "count": 64, "usage": ["backgroundColor", "color"] },
+      { "name": "color/3-2f6fed", "value": "#2f6fed", "count": 22, "usage": ["backgroundColor"] },
+      { "name": "color/4-e6e8ef", "value": "#e6e8ef", "count": 18, "usage": ["borderTopColor"] }
+    ],
+    "typography": [
+      { "name": "type/1", "fontFamily": "Inter, Arial, sans-serif", "fontSize": 14, "fontWeight": "400", "lineHeight": 20, "letterSpacing": 0, "count": 34 },
+      { "name": "type/2", "fontFamily": "Inter, Arial, sans-serif", "fontSize": 28, "fontWeight": "700", "lineHeight": 36, "letterSpacing": 0, "count": 4 }
+    ],
+    "radii": [
+      { "name": "radius/8", "value": 8, "count": 24 },
+      { "name": "radius/999", "value": 999, "count": 8 }
+    ],
+    "shadows": [
+      { "name": "shadow/1", "value": "0px 8px 24px rgba(0, 0, 0, 0.12)", "count": 5 }
+    ],
+    "spacing": [
+      { "name": "space/8", "value": 8, "count": 42 },
+      { "name": "space/12", "value": 12, "count": 31 },
+      { "name": "space/16", "value": 16, "count": 28 },
+      { "name": "space/24", "value": 24, "count": 10 }
+    ]
+  },
+  "components": [
+    {
+      "id": "component-1",
+      "name": "Primary Button",
+      "category": "button",
+      "signature": "button|button||primary|120|40|0|text",
+      "count": 8,
+      "states": ["default", "hover", "disabled"],
+      "examples": [
+        {
+          "tag": "button",
+          "role": "",
+          "text": "Continue",
+          "className": "primary button",
+          "width": 120,
+          "height": 40,
+          "styles": {
+            "color": "#ffffff",
+            "backgroundColor": "#2f6fed",
+            "borderRadius": "8px",
+            "boxShadow": "",
+            "fontFamily": "Inter, Arial, sans-serif",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "lineHeight": 20
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "stats": {
+    "scannedElements": 120,
+    "componentGroups": 1,
+    "assetCount": 0
+  }
+}
+

@@ -1,0 +1,21 @@
+# Local captures and generated release artifacts
+/exports/
+/dist/
+/tmp/
+/tmp-*.png
+
+# Local environment and editor files
+/.env
+/.env.*
+/.vscode/
+/.idea/
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dependency folders, if added later
+/node_modules/
+

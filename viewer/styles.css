@@ -1,0 +1,268 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-subtle: #f8f8f9;
+  --text: #111216;
+  --muted: #666b76;
+  --line: #dedfe4;
+  --accent: #1166cc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 960px;
+  min-height: 100vh;
+  font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, #111 0 50%, transparent 50%),
+    linear-gradient(180deg, #1166cc 0 50%, #e34c4c 50%);
+}
+
+h1 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0;
+}
+
+#source,
+#status,
+.metrics {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border: 1px dashed #b8bbc3;
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--surface-subtle);
+  cursor: pointer;
+}
+
+.dropzone input {
+  display: none;
+}
+
+textarea {
+  width: 100%;
+  min-height: 360px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: #1d1f25;
+  background: #fbfbfc;
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+#render {
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #111216;
+  cursor: pointer;
+}
+
+.content {
+  min-width: 0;
+  padding: 20px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.tab {
+  min-width: 92px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.tab.active {
+  color: var(--text);
+  background: #eceef2;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.swatch,
+.type-row,
+.token-row,
+.component {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.swatch {
+  overflow: hidden;
+}
+
+.swatch-color {
+  height: 76px;
+}
+
+.swatch-body,
+.component,
+.type-row,
+.token-row {
+  padding: 12px;
+}
+
+.name {
+  overflow-wrap: anywhere;
+  font-weight: 650;
+}
+
+.meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.type-list,
+.token-list,
+.component-list {
+  display: grid;
+  gap: 10px;
+}
+
+.type-row {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.sample {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.token-row {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 100px;
+  align-items: center;
+  gap: 12px;
+}
+
+.bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #d8dbe2;
+}
+
+.component {
+  display: grid;
+  gap: 10px;
+}
+
+.component-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 40px;
+  min-height: 28px;
+  padding: 6px 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.empty {
+  padding: 28px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--surface);
+}
+

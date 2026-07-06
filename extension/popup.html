@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UI Trace · Web 采集器</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --surface: #f7f7f7;
+        --surface-hover: #f2f2f2;
+        --text: #0d0d0d;
+        --muted: #666666;
+        --subtle: #8a8a8a;
+        --border: rgba(13, 13, 13, 0.12);
+        --success-bg: #ecfdf3;
+        --success: #168a55;
+        --danger: #9a3412;
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scrollbar-gutter: stable;
+      }
+
+      body {
+        width: 360px;
+        margin: 0;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+        color: var(--text);
+        background: var(--bg);
+        font: 12px/1.42 Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      }
+
+      .shell {
+        display: grid;
+        gap: 14px;
+        padding: 18px 20px 16px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 8px;
+      }
+
+      .eyebrow {
+        width: max-content;
+        padding: 2px 9px;
+        border-radius: 999px;
+        color: #3d3d3d;
+        background: var(--surface);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      p {
+        color: var(--muted);
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+      }
+
+      .session {
+        position: relative;
+        z-index: 5;
+        overflow: visible;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #ffffff;
+      }
+
+      .session.empty .session-icon {
+        color: var(--subtle);
+        background: var(--surface);
+      }
+
+      .session.empty .clear {
+        visibility: hidden;
+      }
+
+      .session-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+      }
+
+      .session-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .session-icon {
+        width: 32px;
+        height: 32px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        color: var(--success);
+        background: var(--success-bg);
+      }
+
+      .session-icon svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+      }
+
+      #session-count {
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .clear {
+        width: auto;
+        height: auto;
+        min-height: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border: 0;
+        padding: 0;
+        color: var(--danger);
+        background: transparent;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .clear svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .session-meta {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 10px 14px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+      }
+
+      .session-meta svg {
+        flex: 0 0 auto;
+        width: 16px;
+        height: 16px;
+        color: var(--muted);
+      }
+
+      #session-host {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #session-latest {
+        white-space: nowrap;
+      }
+
+      .edit-label {
+        width: auto;
+        height: auto;
+        min-height: 0;
+        margin-left: auto;
+        border: 0;
+        padding: 0;
+        color: var(--muted);
+        background: transparent;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .edit-label:hover {
+        color: var(--text);
+      }
+
+      .session.empty .edit-label {
+        visibility: hidden;
+      }
+
+      .label-editor {
+        display: grid;
+        gap: 8px;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 14px;
+        border-top: 0 solid transparent;
+        background: #ffffff;
+        opacity: 0;
+        transform: translateY(-4px);
+        visibility: hidden;
+        transition: max-height 190ms cubic-bezier(0.2, 0.8, 0.2, 1), padding 190ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease, transform 150ms ease, visibility 0s linear 190ms;
+      }
+
+      .label-editor.open {
+        position: relative;
+        z-index: 25;
+        max-height: 96px;
+        overflow: visible;
+        padding: 10px 14px 12px;
+        border-top-width: 1px;
+        border-top-color: var(--border);
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+        transition: max-height 190ms cubic-bezier(0.2, 0.8, 0.2, 1), padding 190ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease, transform 160ms ease, visibility 0s;
+      }
+
+      .label-editor.options-open {
+        max-height: 96px;
+      }
+
+      .label-editor-title {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .label-editor-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 8px;
+        align-items: start;
+      }
+
+      .label-editor select {
+        display: none;
+        width: 100%;
+        height: 34px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 10px;
+        color: var(--text);
+        background: #ffffff;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      .custom-label-select {
+        position: relative;
+        min-width: 0;
+      }
+
+      .label-select-trigger {
+        width: 100%;
+        height: 34px;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 10px;
+        background: #ffffff;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .label-select-trigger svg {
+        width: 14px;
+        height: 14px;
+        flex: 0 0 auto;
+        transition: transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .custom-label-select.open .label-select-trigger svg {
+        transform: rotate(180deg);
+      }
+
+      .label-options {
+        position: absolute;
+        z-index: 40;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        display: grid;
+        gap: 2px;
+        padding: 6px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        opacity: 0;
+        transform: translateY(-4px);
+        transform-origin: top;
+        visibility: hidden;
+        transition: opacity 150ms ease, transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 170ms;
+      }
+
+      .custom-label-select.open .label-options {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+        transition: opacity 150ms ease, transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
+      }
+
+      .label-option {
+        width: 100%;
+        height: 30px;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        border: 0;
+        border-radius: 7px;
+        padding: 0 9px;
+        background: transparent;
+        font-size: 12px;
+        font-weight: 400;
+        text-align: left;
+      }
+
+      .label-option:hover,
+      .label-option[aria-selected="true"] {
+        background: var(--surface-hover);
+      }
+
+      .label-option[aria-selected="true"] {
+        font-weight: 800;
+      }
+
+      .label-editor button {
+        width: auto;
+        height: 34px;
+        min-height: 0;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-size: 12px;
+      }
+
+      .label-editor .label-select-trigger {
+        width: 100%;
+      }
+
+      .label-save {
+        color: #ffffff;
+        background: #000000;
+      }
+
+      .label-cancel {
+        border-color: var(--border);
+        background: #ffffff;
+      }
+
+      .dot {
+        color: var(--subtle);
+      }
+
+      .actions {
+        display: grid;
+        gap: 10px;
+      }
+
+      button {
+        width: 100%;
+        height: 42px;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        padding: 0 14px;
+        color: var(--text);
+        background: #ffffff;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.58;
+      }
+
+      .primary {
+        color: #ffffff;
+        background: #000000;
+      }
+
+      .primary:hover {
+        background: #202020;
+      }
+
+      .secondary,
+      .ghost {
+        border-color: var(--border);
+      }
+
+      .secondary:hover,
+      .ghost:hover {
+        background: var(--surface-hover);
+      }
+
+      .advanced {
+        display: grid;
+        gap: 0;
+      }
+
+      .advanced-toggle {
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 0;
+        border-top: 1px solid var(--border);
+        border-radius: 0;
+        padding: 0 8px 0 0;
+        background: transparent;
+        transition: color 160ms ease;
+      }
+
+      #advanced-chevron {
+        width: 18px;
+        height: 18px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      #advanced-chevron svg {
+        width: 16px;
+        height: 16px;
+        display: block;
+      }
+
+      .advanced.open #advanced-chevron {
+        transform: rotate(180deg);
+      }
+
+      .advanced-panel {
+        display: grid;
+        gap: 12px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-4px);
+        visibility: hidden;
+        transition: max-height 220ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease, transform 160ms ease, visibility 0s linear 220ms;
+      }
+
+      .advanced.open .advanced-panel {
+        max-height: 520px;
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+        transition: max-height 220ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 180ms ease, transform 180ms ease, visibility 0s;
+      }
+
+      .advanced-section {
+        display: grid;
+        gap: 8px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+
+      .advanced-title {
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .hint {
+        color: var(--subtle);
+      }
+
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 3px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: var(--surface);
+      }
+
+      .segmented::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        border-radius: 7px;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .segmented.full-page::before {
+        transform: translateX(100%);
+      }
+
+      .segment {
+        position: relative;
+        z-index: 1;
+        height: 30px;
+        min-height: 0;
+        border: 0;
+        border-radius: 7px;
+        color: var(--muted);
+        background: transparent;
+        font-weight: 700;
+        transition: color 160ms ease;
+      }
+
+      .segment.active {
+        color: var(--text);
+        background: transparent;
+        box-shadow: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .advanced-toggle,
+        #advanced-chevron,
+        .advanced-panel,
+        .label-editor,
+        .label-select-trigger svg,
+        .label-options,
+        .segmented::before,
+        .segment {
+          transition: none;
+        }
+      }
+
+      #replica-scope {
+        display: none;
+      }
+
+      #status {
+        min-height: 16px;
+        color: var(--subtle);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="eyebrow">Chrome 插件</div>
+        <h1>逆向设计系统</h1>
+        <p>采集网页界面，生成可导入 Figma 的设计系统草稿。</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <section id="session-card" class="session empty" aria-label="当前会话">
+        <div class="session-top">
+          <div class="session-title">
+            <span class="session-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none">
+                <path d="M5 10.4L8.3 13.6L15 6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span id="session-count">尚未采集</span>
+          </div>
+          <button id="clear-session" class="clear" type="button" disabled>
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 4H13M6 4V2.8H10V4M5 6V13H11V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span id="clear-label">清空</span>
+          </button>
+        </div>
+        <div class="session-meta">
+          <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M2.5 9H15.5M9 2C11 4 12 6.3 12 9C12 11.7 11 14 9 16M9 2C7 4 6 6.3 6 9C6 11.7 7 14 9 16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <span id="session-host">打开网页后点击采集当前页面</span>
+          <span id="latest-separator" class="dot">·</span>
+          <span id="session-latest">最新：-</span>
+          <button id="edit-latest-label" class="edit-label" type="button" disabled>修改</button>
+        </div>
+        <div id="label-editor" class="label-editor" inert>
+          <div class="label-editor-title">修改最新标签</div>
+          <div class="label-editor-row">
+            <select id="latest-label-select" aria-label="最新标签">
+              <option value="default">默认状态</option>
+              <option value="menu-open">菜单打开</option>
+              <option value="modal-open">弹窗打开</option>
+              <option value="sidebar-open">侧栏展开</option>
+              <option value="selected">选中状态</option>
+              <option value="focused">聚焦状态</option>
+              <option value="visible-interactive-states">可见交互状态</option>
+              <option value="screenshot-viewport">当前可见区域截图</option>
+              <option value="screenshot-full-page">完整页面截图</option>
+            </select>
+            <button id="save-latest-label" class="label-save" type="button">保存</button>
+            <button id="cancel-latest-label" class="label-cancel" type="button">取消</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="actions">
+        <button id="capture" class="primary">采集当前页面</button>
+        <button id="export-normalized" class="secondary" disabled>导出规范化 JSON</button>
+      </section>
+
+      <section id="advanced" class="advanced">
+        <button id="advanced-toggle" class="advanced-toggle" type="button" aria-expanded="false">
+          <span>高级</span>
+          <span id="advanced-chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+        <div id="advanced-panel" class="advanced-panel" inert>
+          <section class="advanced-section">
+            <div class="advanced-title">采集可见交互状态</div>
+            <button id="capture-interactive" class="secondary">采集可见交互状态</button>
+            <div class="hint">尝试打开菜单、下拉、Tab、展开项并采集变化状态。</div>
+          </section>
+
+          <section class="advanced-section">
+            <div class="advanced-title">页面截图参考</div>
+            <select id="replica-scope" aria-label="截图范围">
+              <option value="viewport" selected>当前可见区域</option>
+              <option value="full-page">尝试完整页面</option>
+            </select>
+            <div id="scope-segmented" class="segmented" aria-label="截图范围">
+              <button class="segment active" type="button" data-scope="viewport">当前可见区域</button>
+              <button class="segment" type="button" data-scope="full-page">尝试完整页面</button>
+            </div>
+            <button id="capture-replica" class="secondary">采集截图参考</button>
+            <div class="hint">为 Figma 保留页面截图参考，不参与设计系统生成主流程。</div>
+          </section>
+
+          <section class="advanced-section">
+            <div class="advanced-title">调试数据</div>
+            <button id="export-session" class="ghost" disabled>导出原始数据</button>
+            <div class="hint">用于排查采集和规范化问题。</div>
+          </section>
+        </div>
+      </section>
+
+      <div id="status" role="status"></div>
+    </main>
+    <script src="normalizer.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

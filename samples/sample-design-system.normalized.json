@@ -1,0 +1,199 @@
+{
+  "normalizedVersion": "0.1.0",
+  "source": {
+    "url": "https://example.com",
+    "hostname": "example.com",
+    "title": "Example Product",
+    "capturedAt": "2026-05-08T00:00:00.000Z",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "semanticTokens": {
+    "colors": [
+      {
+        "name": "color/fg/default",
+        "value": "#111111",
+        "aliases": [
+          "color/1-111111"
+        ],
+        "role": "fg/default",
+        "count": 80,
+        "rationale": "Observed in color, backgroundColor with hue 0, saturation 0, lightness 7."
+      },
+      {
+        "name": "color/white-2",
+        "value": "#ffffff",
+        "aliases": [
+          "color/2-ffffff"
+        ],
+        "role": "white-2",
+        "count": 64,
+        "rationale": "Observed in backgroundColor, color with hue 0, saturation 0, lightness 100."
+      },
+      {
+        "name": "color/blue/450",
+        "value": "#2f6fed",
+        "aliases": [
+          "color/3-2f6fed"
+        ],
+        "role": "blue/450",
+        "count": 22,
+        "rationale": "Observed in backgroundColor with hue 220, saturation 84, lightness 56."
+      },
+      {
+        "name": "color/blue/100",
+        "value": "#e6e8ef",
+        "aliases": [
+          "color/4-e6e8ef"
+        ],
+        "role": "blue/100",
+        "count": 18,
+        "rationale": "Observed in borderTopColor with hue 227, saturation 22, lightness 92."
+      }
+    ],
+    "typography": [
+      {
+        "name": "type/title-bold",
+        "fontFamily": "Inter, Arial, sans-serif",
+        "fontSize": 28,
+        "fontWeight": "700",
+        "lineHeight": 36,
+        "letterSpacing": 0,
+        "count": 4,
+        "aliases": [
+          "type/2"
+        ]
+      },
+      {
+        "name": "type/body-small-regular",
+        "fontFamily": "Inter, Arial, sans-serif",
+        "fontSize": 14,
+        "fontWeight": "400",
+        "lineHeight": 20,
+        "letterSpacing": 0,
+        "count": 34,
+        "aliases": [
+          "type/1"
+        ]
+      }
+    ],
+    "spacing": [
+      {
+        "name": "space/8",
+        "value": 8,
+        "count": 42,
+        "aliases": [
+          "space/8"
+        ]
+      },
+      {
+        "name": "space/12",
+        "value": 12,
+        "count": 31,
+        "aliases": [
+          "space/12"
+        ]
+      },
+      {
+        "name": "space/16",
+        "value": 16,
+        "count": 28,
+        "aliases": [
+          "space/16"
+        ]
+      },
+      {
+        "name": "space/24",
+        "value": 24,
+        "count": 10,
+        "aliases": [
+          "space/24"
+        ]
+      }
+    ],
+    "radii": [
+      {
+        "name": "radius/md",
+        "value": 8,
+        "count": 24,
+        "aliases": [
+          "radius/8"
+        ]
+      },
+      {
+        "name": "radius/full",
+        "value": 999,
+        "count": 8,
+        "aliases": [
+          "radius/999"
+        ]
+      }
+    ],
+    "shadows": [
+      {
+        "name": "shadow/elevated",
+        "value": "0px 8px 24px rgba(0, 0, 0, 0.12)",
+        "count": 5,
+        "aliases": [
+          "shadow/1"
+        ]
+      }
+    ]
+  },
+  "componentModel": [
+    {
+      "name": "Button",
+      "category": "button",
+      "variants": {
+        "state": [
+          "default",
+          "disabled",
+          "hover"
+        ],
+        "size": [
+          "md"
+        ],
+        "tone": [
+          "primary"
+        ]
+      },
+      "sourceComponentIds": [
+        "component-1"
+      ],
+      "slots": [
+        "label"
+      ],
+      "examples": [
+        {
+          "tag": "button",
+          "role": "",
+          "text": "Continue",
+          "className": "primary button",
+          "width": 120,
+          "height": 40,
+          "styles": {
+            "color": "#ffffff",
+            "backgroundColor": "#2f6fed",
+            "borderRadius": "8px",
+            "boxShadow": "",
+            "fontFamily": "Inter, Arial, sans-serif",
+            "fontSize": 14,
+            "fontWeight": "600",
+            "lineHeight": 20
+          }
+        }
+      ],
+      "rationale": "Grouped by category, dimensions, available states, and text/icon structure."
+    }
+  ],
+  "trace": {
+    "rawVersion": "0.1.0",
+    "rawStats": {
+      "scannedElements": 120,
+      "componentGroups": 1,
+      "assetCount": 0
+    }
+  }
+}
