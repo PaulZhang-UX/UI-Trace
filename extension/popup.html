@@ -1838,7 +1838,16 @@
         opacity: 1;
         padding-top: 0 !important;
         padding-bottom: 28px !important;
+        overflow: visible;
         pointer-events: auto;
+      }
+
+      .session.expanded .label-editor .custom-label-select {
+        z-index: 60;
+      }
+
+      .session.expanded .label-editor .label-options {
+        z-index: 100;
       }
 
       .advanced.is-advanced.expanded .advanced-panel {
