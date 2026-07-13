@@ -12,6 +12,36 @@ The output is intentionally a draft. It helps designers find, copy, and refine r
 
 Raw values and source traces stay visible. Semantic token names, variants, component sets, and container/page patterns are inferred and require design review.
 
+## 安装说明
+
+### 安装 Chrome 插件
+
+1. 前往 [Releases](https://github.com/PaulZhang-UX/UI-Trace/releases/latest) 下载 `chrome-extension.zip`。
+2. 解压该文件到本地。
+3. 打开 Chrome，进入 `chrome://extensions/`。
+4. 开启右上角的「开发者模式」。
+5. 点击「加载已解压的扩展程序」。
+6. 选择解压后的 `chrome-extension` 文件夹。
+
+安装完成后，打开需要采集的网页，点击浏览器工具栏中的 UI Trace 图标即可开始使用。
+
+### 安装 Figma 插件
+
+1. 前往 [Releases](https://github.com/PaulZhang-UX/UI-Trace/releases/latest) 下载 `figma-plugin.zip`。
+2. 解压该文件到本地。
+3. 打开 Figma Desktop。
+4. 进入「Plugins」→「Development」→「Import plugin from manifest」。
+5. 选择解压后的 `figma-plugin/manifest.json` 文件。
+6. 导入后，从「Plugins」→「Development」中运行 UI Trace。
+
+### 基本使用流程
+
+1. 在 Chrome 中采集网页界面。
+2. 点击「导出」，下载标准化 JSON 文件。
+3. 在 Figma 中运行 UI Trace。
+4. 点击「上传」，选择导出的 JSON 文件。
+5. 点击「生成」导入设计系统内容。
+
 ## Project Structure
 
 - `extension/` - unpacked Chrome extension for page extraction.
