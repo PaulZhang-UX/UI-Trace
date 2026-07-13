@@ -4,16 +4,40 @@
     <meta charset="utf-8">
     <style>
       :root {
-        --bg: #ffffff;
-        --surface: #f7f7f7;
-        --surface-hover: #f2f2f2;
-        --text: #0d0d0d;
-        --text-muted: #666666;
-        --text-subtle: #8a8a8a;
-        --border: rgba(13, 13, 13, 0.12);
-        --border-strong: rgba(13, 13, 13, 0.24);
-        --focus: rgba(13, 13, 13, 0.12);
-        --radius: 10px;
+        color-scheme: light;
+        --page: #f3f3f3;
+        --panel: #ffffff;
+        --surface: #ffffff;
+        --soft: #f4f4f4;
+        --soft-2: #f9f9f9;
+        --text: #101010;
+        --muted: #666666;
+        --label: #555555;
+        --quiet: #969696;
+        --border: #dddddd;
+        --border-strong: rgba(0, 0, 0, 0.15);
+        --action: #0d0d0d;
+        --action-text: #ffffff;
+        --green: #00c961;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.055), 0 0 0.5px rgba(0, 0, 0, 0.28);
+      }
+
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --page: #0b0b0b;
+        --panel: #050505;
+        --surface: #202020;
+        --soft: #252525;
+        --soft-2: #1b1b1b;
+        --text: #ffffff;
+        --muted: #a7a7a7;
+        --label: #d6d6d6;
+        --quiet: #8b8b8b;
+        --border: #464646;
+        --border-strong: rgba(255, 255, 255, 0.42);
+        --action: #f5f5f5;
+        --action-text: #111111;
+        --shadow: 0 4px 14px rgba(0, 0, 0, 0.34), 0 0 0.5px rgba(255, 255, 255, 0.18);
       }
 
       * {
@@ -21,136 +45,195 @@
       }
 
       body {
+        width: 380px;
+        min-height: 292px;
         margin: 0;
         overflow: hidden;
         color: var(--text);
-        background: var(--bg);
-        font: 12px/1.42 Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+        background: var(--page);
+        font: 12px/1.2 "PingFang SC", "Microsoft YaHei", Inter, system-ui, sans-serif;
+      }
+
+      button,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
+        outline: 2px solid var(--green);
+        outline-offset: 2px;
       }
 
       .shell {
-        height: 100vh;
-        display: grid;
-        grid-template-rows: 1fr auto;
-        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+        border-radius: 30px;
+        background: var(--panel);
       }
 
-      .content {
-        display: grid;
-        align-content: start;
-        gap: 12px;
-        padding: 20px 28px 14px;
+      .topbar {
+        height: 27px;
+        display: flex;
+        align-items: center;
       }
 
-      .hero {
-        display: grid;
+      .top-chip {
+        min-height: 27px;
+        display: inline-flex;
+        align-items: center;
         gap: 8px;
+        padding: 7px 15px;
+        border-radius: 24px;
+        color: var(--text);
+        background: var(--soft);
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 13px;
       }
 
-      .eyebrow {
-        width: max-content;
-        padding: 2px 9px;
-        border-radius: 999px;
-        color: #3d3d3d;
+      .mode-dot {
+        width: 7px;
+        height: 7px;
+        flex: 0 0 7px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      .content-stack {
+        width: 350px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .file-card {
+        position: relative;
+        min-height: 147px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 15px;
+        padding: 30px;
+        border-radius: 24px;
+        color: var(--text);
         background: var(--surface);
-        font-size: 11px;
-        font-weight: 700;
-      }
-
-      h1,
-      h2,
-      p {
-        margin: 0;
-      }
-
-      h1 {
-        font-size: 24px;
-        line-height: 1.12;
-        letter-spacing: 0;
-      }
-
-      h2 {
-        font-size: 15px;
-        line-height: 1.25;
-      }
-
-      p {
-        color: var(--text-muted);
-      }
-
-      .section {
-        display: grid;
-        gap: 8px;
-        padding-top: 12px;
-        border-top: 1px solid var(--border);
-      }
-
-      .file-picker {
-        min-height: 82px;
-        display: grid;
-        place-items: center;
-        padding: 12px;
-        border: 1px dashed var(--border-strong);
-        border-radius: var(--radius);
-        background: #ffffff;
-        cursor: pointer;
-        transition: background 120ms ease, border-color 120ms ease;
-      }
-
-      .file-picker:hover,
-      .file-picker.dragover {
-        border-color: rgba(13, 13, 13, 0.46);
-        background: #fafafa;
+        box-shadow: var(--shadow);
       }
 
       .file-row {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 12px;
-        max-width: 430px;
+        gap: 35px;
       }
 
-      .upload-icon {
+      .file-ring {
+        width: 71px;
+        height: 71px;
+        flex: 0 0 71px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        border: 10px solid var(--soft);
+        border-radius: 50%;
+        color: var(--text);
+        background: var(--surface);
+      }
+
+      .has-file .file-ring {
+        border-color: var(--green);
+      }
+
+      .file-ring svg {
+        display: block;
         width: 26px;
         height: 26px;
-        flex: 0 0 auto;
-        color: var(--text);
+        overflow: visible;
+        transform: translateX(1px);
       }
 
       .file-copy {
         min-width: 0;
         display: grid;
-        gap: 2px;
+        gap: 19px;
+        cursor: pointer;
       }
 
       .file-title {
+        min-width: 0;
+        overflow: hidden;
         color: var(--text);
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 23px;
+        font-weight: 900;
+        line-height: 24px;
+        letter-spacing: 0;
+        white-space: nowrap;
       }
 
       .file-name {
-        min-width: 0;
         overflow: hidden;
-        color: var(--text-muted);
+        max-width: 190px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 12px;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
+      .settings-toggle {
+        position: absolute;
+        left: 50%;
+        bottom: 9px;
+        width: 46px;
+        height: 18px;
+        padding: 0;
+        border-radius: 999px;
+        background: transparent;
+        transform: translateX(-50%);
+      }
+
+      .settings-toggle::before {
+        content: "";
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 7px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--quiet);
+      }
+
+      .settings-panel {
+        display: none;
+        gap: 15px;
+        padding-bottom: 15px;
+      }
+
+      .settings-open .settings-panel {
+        display: grid;
+      }
+
       .field {
         display: grid;
-        gap: 6px;
+        gap: 15px;
       }
 
       label {
-        color: var(--text);
-        font-size: 12px;
-        font-weight: 700;
-      }
-
-      .hint {
-        color: var(--text-subtle);
+        color: var(--label);
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 16px;
       }
 
       .native-select {
@@ -163,97 +246,74 @@
 
       .select-trigger {
         width: 100%;
-        height: 38px;
+        min-height: 38px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 8px;
+        padding: 12px 15px;
         border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 0 10px 0 12px;
+        border-radius: 30px;
         color: var(--text);
-        background: #ffffff;
+        background: var(--surface);
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 14px;
         text-align: left;
       }
 
-      .select-trigger:hover {
-        background: #fbfbfb;
-      }
-
-      .select-trigger[aria-expanded="true"] {
-        border-color: rgba(13, 13, 13, 0.42);
+      .select-label {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .chevron {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
         flex: 0 0 auto;
-        color: var(--text);
       }
 
       .select-menu {
         position: absolute;
-        z-index: 10;
+        z-index: 30;
         top: calc(100% + 6px);
         left: 0;
         right: 0;
         display: none;
-        overflow: hidden;
+        padding: 6px;
         border: 1px solid var(--border);
-        border-radius: 8px;
-        background: #ffffff;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+        border-radius: 15px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
       }
 
       .select-wrap.open .select-menu {
         display: grid;
-        padding: 4px;
-      }
-
-      .select-wrap[data-select="language"] .select-menu {
-        top: auto;
-        bottom: calc(100% + 6px);
       }
 
       .select-option {
-        width: 100%;
-        height: 30px;
-        border: 0;
-        border-radius: 6px;
-        padding: 0 10px;
+        min-height: 28px;
+        padding: 6px 9px;
+        border-radius: 10px;
         color: var(--text);
         background: transparent;
         text-align: left;
-        font-weight: 500;
+        font-size: 12px;
       }
 
-      .select-option:hover {
-        background: var(--surface);
-      }
-
+      .select-option:hover,
       .select-option.active {
-        background: var(--surface-hover);
-        font-weight: 700;
+        background: var(--soft);
       }
 
-      textarea {
-        width: 100%;
-        height: 92px;
-        padding: 10px;
-        resize: none;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        color: var(--text);
-        background: #ffffff;
-        outline: none;
-        font: 11px/1.45 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-      }
-
-      textarea:focus,
-      button:focus-visible {
-        border-color: rgba(13, 13, 13, 0.46);
-        box-shadow: 0 0 0 3px var(--focus);
-        outline: none;
+      .manual-toggle {
+        justify-self: start;
+        padding: 0;
+        color: var(--muted);
+        background: transparent;
+        font-size: 11px;
       }
 
       .manual {
@@ -265,204 +325,1576 @@
         display: grid;
       }
 
-      .toggle {
-        width: max-content;
-        min-height: auto;
-        border: 0;
-        border-radius: 6px;
-        padding: 0;
-        color: var(--text-muted);
-        background: transparent;
-        font-size: 12px;
-        font-weight: 600;
-      }
-
-      .toggle:hover {
+      textarea {
+        width: 100%;
+        min-height: 84px;
+        resize: vertical;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
         color: var(--text);
+        background: var(--surface);
+        font: 11px/1.4 ui-monospace, Consolas, monospace;
       }
 
       .actions {
-        display: flex;
-        gap: 12px;
-        padding: 12px 28px 14px;
-        border-top: 1px solid var(--border);
-        background: #ffffff;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
       }
 
-      button {
-        min-height: 42px;
-        border: 1px solid transparent;
-        border-radius: var(--radius);
-        padding: 8px 14px;
-        font: inherit;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .toggle,
-      .select-trigger,
-      .select-option {
-        min-height: auto;
-      }
-
-      #import {
-        flex: 1;
-        color: #ffffff;
-        background: #000000;
-      }
-
-      #import:hover {
-        background: #202020;
+      .actions button {
+        height: 56px;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: 500;
+        line-height: 20px;
       }
 
       #cancel {
-        min-width: 98px;
+        border: 1px solid var(--border-strong);
         color: var(--text);
-        border-color: var(--border);
-        background: #ffffff;
+        background-color: var(--surface);
       }
 
-      #cancel:hover {
-        background: var(--surface);
+      #import {
+        color: var(--action-text);
+        background-color: var(--action);
+      }
+
+      :root[data-theme="dark"] #cancel {
+        color: #ffffff;
+        background-color: #050505;
+      }
+
+      :root[data-theme="dark"] #import {
+        color: #111111;
+        background-color: #f5f5f5;
+      }
+
+      .has-file .actions {
+        grid-template-columns: 56px 1fr;
+      }
+
+      .has-file #cancel {
+        padding: 0;
+        border-radius: 50%;
+        font-size: 0;
+      }
+
+      .has-file #cancel::before {
+        content: "‹";
+        font-size: 32px;
+        line-height: 1;
+      }
+
+      .hint {
+        display: none;
+      }
+
+      html {
+        background: transparent;
+        border-radius: 40px;
+        overflow: hidden;
+      }
+
+      body {
+        width: 260px;
+        min-height: 0;
+        border-radius: 40px;
+        overflow: hidden;
+        background: transparent;
+        font-family: "PingFang SC", "PingFang TC", "PingFang HK", sans-serif;
+      }
+
+      .shell {
+        width: 260px;
+        min-height: 0;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 40px;
+        overflow: hidden;
+      }
+
+      .topbar {
+        height: 20px;
+      }
+
+      .top-chip {
+        min-height: 20px;
+        gap: 5px;
+        padding: 5px 9px;
+        border-radius: 18px;
+        font-size: 11px;
+        line-height: 11px;
+      }
+
+      .mode-dot {
+        width: 6px;
+        height: 6px;
+        flex-basis: 6px;
+      }
+
+      .content-stack {
+        width: 240px;
+        gap: 10px;
+      }
+
+      .file-card {
+        min-height: 98px;
+        gap: 10px;
+        padding: 20px;
+        border-radius: 20px;
+      }
+
+      .file-row {
+        gap: 22px;
+      }
+
+      .file-ring {
+        width: 48px;
+        height: 48px;
+        flex-basis: 48px;
+        border-width: 7px;
+      }
+
+      .file-ring svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .file-copy {
+        gap: 11px;
+      }
+
+      .file-title {
+        font-size: 17px;
+        line-height: 18px;
+      }
+
+      .file-name {
+        max-width: 132px;
+        font-size: 8px;
+        line-height: 10px;
+      }
+
+      .settings-toggle {
+        bottom: 4px;
+        width: 34px;
+        height: 16px;
+      }
+
+      .settings-toggle::before {
+        left: 7px;
+        right: 7px;
+        top: 7px;
+        height: 3px;
+      }
+
+      .settings-panel {
+        gap: 10px;
+        padding-bottom: 12px;
+      }
+
+      .field {
+        gap: 8px;
+      }
+
+      label {
+        font-size: 12px;
+        line-height: 13px;
+      }
+
+      .native-select {
+        width: 100%;
+        min-height: 29px;
+        appearance: none;
+        -webkit-appearance: none;
+        display: block;
+        padding: 0 30px 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        color: var(--text);
+        background-color: var(--surface);
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23101010' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-position: right 11px center;
+        background-repeat: no-repeat;
+        background-size: 12px 12px;
+        font-size: 12px;
+        line-height: 13px;
+      }
+
+      :root[data-theme="dark"] .native-select {
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      }
+
+      .select-trigger,
+      .select-menu {
+        display: none !important;
+      }
+
+      .manual-toggle {
+        font-size: 9px;
+      }
+
+      textarea {
+        min-height: 70px;
+        padding: 8px;
+        border-radius: 12px;
+        font-size: 10px;
+      }
+
+      .actions {
+        gap: 10px;
+      }
+
+      .actions button {
+        height: 38px;
+        border-radius: 22px;
+        font-size: 15px;
+        line-height: 16px;
+      }
+
+      .has-file .actions {
+        grid-template-columns: 38px 1fr;
+      }
+
+      .has-file #cancel::before {
+        font-size: 24px;
+      }
+
+      .native-select {
+        display: none;
+      }
+
+      .select-trigger {
+        min-height: 29px;
+        display: flex !important;
+        padding: 0 12px;
+        border-radius: 18px;
+        font-size: 12px;
+        line-height: 13px;
+      }
+
+      .select-menu {
+        top: calc(100% + 6px);
+        display: none !important;
+        padding: 6px;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .select-wrap.open .select-menu {
+        display: grid !important;
+      }
+
+      .select-option {
+        min-height: 26px;
+        padding: 6px 9px;
+        border-radius: 10px;
+        font-size: 12px;
+      }
+
+      .select-option:hover,
+      .select-option.active {
+        background: var(--soft);
+      }
+
+      .has-file .actions {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .has-file #cancel {
+        padding: 0 10px;
+        border-radius: 22px;
+        font-size: 15px;
+      }
+
+      .has-file #cancel::before {
+        content: none;
+      }
+
+      .import-confirm .actions {
+        grid-template-columns: 38px 1fr;
+      }
+
+      .import-confirm #cancel {
+        order: 1;
+        padding: 0;
+        border-radius: 50%;
+        font-size: 0;
+      }
+
+      .import-confirm #cancel::before {
+        content: "‹";
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      .import-confirm #import {
+        order: 2;
+      }
+
+      @property --ring-fill {
+        syntax: "<percentage>";
+        inherits: false;
+        initial-value: 0%;
+      }
+
+      :root {
+        --motion-ease: cubic-bezier(0.22, 0.9, 0.25, 1);
+        --motion-snap: cubic-bezier(0.2, 1.35, 0.35, 1);
+        --theme-wipe-color: #050505;
+      }
+
+      body,
+      .shell,
+      .file-card,
+      .top-chip,
+      #cancel,
+      #import,
+      .select-trigger,
+      .select-option,
+      .settings-toggle::before,
+      .manual-toggle {
+        transition:
+          background-color 220ms var(--motion-ease),
+          border-color 220ms var(--motion-ease),
+          color 180ms var(--motion-ease),
+          box-shadow 220ms var(--motion-ease),
+          opacity 180ms var(--motion-ease),
+          transform 180ms var(--motion-ease);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -36px;
+        z-index: 999;
+        pointer-events: none;
+        background: linear-gradient(110deg, transparent 0%, var(--theme-wipe-color) 38%, var(--theme-wipe-color) 62%, transparent 100%);
+        opacity: 0;
+        transform: translateX(-120%) skewX(-10deg);
+      }
+
+      :root.theme-wipe body::before {
+        animation: theme-wipe 460ms var(--motion-ease) both;
+      }
+
+      button:not(:disabled):active {
+        transform: scale(0.98);
+      }
+
+      .actions {
+        transition: grid-template-columns 230ms var(--motion-ease), gap 180ms var(--motion-ease);
+      }
+
+      .actions button {
+        transition:
+          width 230ms var(--motion-ease),
+          background-color 180ms var(--motion-ease),
+          border-color 180ms var(--motion-ease),
+          color 180ms var(--motion-ease),
+          opacity 160ms var(--motion-ease),
+          transform 160ms var(--motion-ease);
+      }
+
+      .file-ring {
+        position: relative;
+        isolation: isolate;
+        --ring-width: 7px;
+      }
+
+      .file-ring::before,
+      .file-ring::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      .file-ring::before {
+        z-index: 0;
+        background: conic-gradient(from -90deg, var(--green) var(--ring-fill), var(--soft) 0);
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--ring-width)), #000 calc(100% - var(--ring-width)));
+        mask: radial-gradient(farthest-side, transparent calc(100% - var(--ring-width)), #000 calc(100% - var(--ring-width)));
+      }
+
+      .file-ring svg {
+        position: relative;
+        z-index: 1;
+        --icon-offset-x: 1px;
+        transform: translateX(var(--icon-offset-x));
+      }
+
+      .file-ring .ring-progress {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        opacity: 0;
+        transform: rotate(-90deg);
+      }
+
+      .ring-progress-track,
+      .ring-progress-fill {
+        fill: none;
+        stroke-width: 7;
+      }
+
+      .ring-progress-track {
+        stroke: var(--soft);
+      }
+
+      .ring-progress-fill {
+        stroke: var(--green);
+        stroke-linecap: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+      }
+
+      .shell.is-generating .file-ring {
+        border-color: transparent !important;
+      }
+
+      .shell.is-generating .file-ring::before {
+        opacity: 0;
+        animation: none;
+      }
+
+      .shell.is-generating .file-ring::after {
+        opacity: 0;
+        animation: none;
+      }
+
+      .shell.is-generating .file-ring .ring-progress {
+        opacity: 1;
+        animation: none;
+      }
+
+      .shell.is-generating .file-ring .ring-progress-fill {
+        animation: ring-stroke-fill 950ms cubic-bezier(0.2, 0.85, 0.2, 1) forwards;
+      }
+
+      .shell.is-generating .file-ring svg {
+        animation: icon-focus 900ms ease-in-out infinite alternate;
+      }
+
+      .shell.motion-success .file-ring {
+        animation: ring-pop 560ms var(--motion-snap);
+      }
+
+      .shell.motion-success .file-ring::after {
+        border: 2px solid var(--green);
+        animation: ring-wave 620ms ease-out forwards;
+      }
+
+      .shell.motion-error .file-ring {
+        animation: micro-shake 260ms ease-in-out;
+      }
+
+      .settings-open .settings-panel,
+      .manual.open {
+        animation: drawer-in 220ms var(--motion-ease) both;
+      }
+
+      .select-wrap.open .select-menu {
+        animation: menu-in 140ms var(--motion-ease) both;
+      }
+
+      @keyframes ring-fill {
+        from {
+          --ring-fill: 0%;
+        }
+        to {
+          --ring-fill: 100%;
+        }
+      }
+
+      @keyframes ring-stroke-fill {
+        from {
+          stroke-dashoffset: 100;
+        }
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes ring-hold {
+        from {
+          transform: scale(1);
+        }
+        to {
+          transform: scale(1.025);
+        }
+      }
+
+      @keyframes ring-cap {
+        from {
+          transform: rotate(0deg) translateY(calc(-24px + var(--ring-width) / 2));
+        }
+        to {
+          transform: rotate(360deg) translateY(calc(-24px + var(--ring-width) / 2));
+        }
+      }
+
+      @keyframes ring-cap-hold {
+        from {
+          transform: rotate(360deg) translateY(calc(-24px + var(--ring-width) / 2)) scale(1);
+        }
+        to {
+          transform: rotate(360deg) translateY(calc(-24px + var(--ring-width) / 2)) scale(1.12);
+        }
+      }
+
+      @keyframes ring-pop {
+        0% {
+          transform: scale(1);
+        }
+        58% {
+          transform: scale(1.09);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes ring-wave {
+        0% {
+          inset: -2px;
+          opacity: 0.52;
+          transform: scale(0.98);
+        }
+        100% {
+          inset: -9px;
+          opacity: 0;
+          transform: scale(1.08);
+        }
+      }
+
+      @keyframes icon-focus {
+        from {
+          transform: translateX(var(--icon-offset-x)) scale(1);
+        }
+        to {
+          transform: translateX(var(--icon-offset-x)) scale(1.08);
+        }
+      }
+
+      @keyframes micro-shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        30% {
+          transform: translateX(-3px);
+        }
+        65% {
+          transform: translateX(3px);
+        }
+      }
+
+      @keyframes drawer-in {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes menu-in {
+        from {
+          opacity: 0;
+          transform: translateY(4px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes theme-wipe {
+        0% {
+          opacity: 0;
+          transform: translateX(-120%) skewX(-10deg);
+        }
+        22% {
+          opacity: 0.95;
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(120%) skewX(-10deg);
+        }
+      }
+
+      :root {
+        --motion-ease: cubic-bezier(0.2, 0.85, 0.18, 1);
+        --motion-morph: cubic-bezier(0.18, 0.92, 0.18, 1);
+        --motion-snap: cubic-bezier(0.18, 1.45, 0.32, 1);
+      }
+
+      html,
+      body,
+      .shell {
+        border-radius: 0 !important;
+      }
+
+      body::before,
+      :root.theme-wipe body::before {
+        display: none !important;
+        animation: none !important;
+      }
+
+      body,
+      .shell,
+      .file-card,
+      .top-chip,
+      #cancel,
+      #import,
+      .select-trigger,
+      .select-option,
+      .settings-toggle,
+      .settings-toggle::before,
+      .manual-toggle {
+        transition:
+          background-color 520ms var(--motion-ease),
+          border-color 520ms var(--motion-ease),
+          color 420ms var(--motion-ease),
+          box-shadow 520ms var(--motion-ease),
+          opacity 360ms var(--motion-ease),
+          transform 360ms var(--motion-ease);
+      }
+
+      .file-card {
+        cursor: pointer;
+      }
+
+      .file-card:hover {
+        animation: pulse-glow 1600ms ease-in-out infinite;
+        box-shadow: 0 8px 24px rgba(0, 201, 97, 0.14), var(--shadow);
+      }
+
+      .file-card:hover .file-ring {
+        box-shadow: 0 0 0 6px rgba(0, 201, 97, 0.08), 0 0 24px rgba(0, 201, 97, 0.22);
+        transform: scale(1.025);
+      }
+
+      .file-card:has(.settings-toggle:hover) {
+        animation: none;
+        box-shadow: var(--shadow);
+      }
+
+      .file-card:has(.settings-toggle:hover) .file-ring {
+        box-shadow: none;
+        transform: none;
+      }
+
+      .top-chip:not(:disabled):hover,
+      #cancel:not(:disabled):hover,
+      #import:not(:disabled):hover,
+      .select-trigger:not(:disabled):hover,
+      .manual-toggle:not(:disabled):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      #import:not(:disabled):hover {
+        filter: brightness(1.08);
+      }
+
+      .select-trigger:not(:disabled):hover,
+      #cancel:not(:disabled):hover {
+        border-color: rgba(0, 201, 97, 0.34);
+      }
+
+      .settings-toggle {
+        top: 70px !important;
+        right: 0 !important;
+        bottom: auto !important;
+        left: 0 !important;
+        z-index: 4;
+        width: 100% !important;
+        height: 30px !important;
+        border-radius: 0 !important;
+        transform: none !important;
+        cursor: pointer;
+      }
+
+      .settings-toggle::before {
+        top: 12px !important;
+        right: auto !important;
+        left: 50% !important;
+        width: 34px !important;
+        height: 3px !important;
+        transform: translateX(-50%);
+      }
+
+      .settings-toggle:not(:disabled):hover {
+        background: linear-gradient(to bottom, transparent, rgba(0, 201, 97, 0.07));
+      }
+
+      .settings-toggle:not(:disabled):hover::before,
+      .settings-toggle[aria-expanded="true"]::before {
+        width: 42px !important;
+        background: var(--green);
+      }
+
+      .actions {
+        transition: grid-template-columns 560ms var(--motion-morph), gap 420ms var(--motion-ease);
+      }
+
+      .actions button {
+        transition:
+          width 560ms var(--motion-morph),
+          max-width 560ms var(--motion-morph),
+          background-color 420ms var(--motion-ease),
+          border-color 420ms var(--motion-ease),
+          color 360ms var(--motion-ease),
+          opacity 320ms var(--motion-ease),
+          transform 320ms var(--motion-ease),
+          box-shadow 360ms var(--motion-ease);
+      }
+
+      .import-confirm .actions {
+        grid-template-columns: 38px 1fr !important;
+      }
+
+      .shell.is-generating .file-ring .ring-progress-fill {
+        animation: ring-stroke-fill 1800ms cubic-bezier(0.2, 0.85, 0.2, 1) forwards;
+      }
+
+      .shell.is-generating .file-ring svg:not(.ring-progress) {
+        animation: icon-focus 1400ms ease-in-out infinite alternate;
+      }
+
+      .shell.motion-success .file-ring {
+        animation: ring-pop 980ms var(--motion-snap);
+      }
+
+      .shell.motion-success .file-ring::after {
+        animation: ring-wave 1050ms ease-out forwards;
+      }
+
+      .shell.motion-error .file-ring {
+        animation: micro-shake 420ms ease-in-out;
+      }
+
+      .settings-open .settings-panel,
+      .manual.open {
+        animation: drawer-in 420ms var(--motion-ease) both;
+      }
+
+      .select-wrap.open .select-menu {
+        animation: menu-in 280ms var(--motion-ease) both;
+      }
+
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          box-shadow: 0 3px 12px rgba(0, 0, 0, 0.055), 0 0 0 rgba(0, 201, 97, 0);
+        }
+        50% {
+          box-shadow: 0 8px 24px rgba(0, 201, 97, 0.18), 0 0 0 5px rgba(0, 201, 97, 0.055);
+        }
+      }
+
+      :root {
+        --hover-glow: rgba(0, 201, 97, 0.18);
+        --hover-glow-soft: rgba(0, 201, 97, 0.08);
+        --hover-surface-shadow: rgba(0, 0, 0, 0.08);
+      }
+
+      :root[data-theme="dark"] {
+        --hover-glow: rgba(0, 255, 132, 0.34);
+        --hover-glow-soft: rgba(0, 255, 132, 0.16);
+        --hover-surface-shadow: rgba(0, 255, 132, 0.16);
+      }
+
+      .file-row {
+        order: 1;
+      }
+
+      .settings-panel {
+        order: 2;
+      }
+
+      .settings-toggle {
+        position: relative !important;
+        order: 3;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        height: 28px !important;
+        flex: 0 0 28px;
+        margin: -2px 0 0 !important;
+        background: transparent !important;
+        transform: none !important;
+      }
+
+      .settings-toggle::before {
+        top: 12px !important;
+        width: 34px !important;
+        background: var(--quiet) !important;
+      }
+
+      .settings-toggle[aria-expanded="true"]::before {
+        width: 34px !important;
+        background: var(--quiet) !important;
+      }
+
+      .settings-toggle:not(:disabled):hover {
+        background: linear-gradient(to bottom, transparent, var(--hover-glow-soft)) !important;
+      }
+
+      .settings-toggle:not(:disabled):hover::before {
+        width: 42px !important;
+        background: var(--green) !important;
+      }
+
+      .file-ring,
+      .file-ring::before,
+      .file-ring::after,
+      .file-ring .ring-progress {
+        transition:
+          opacity 520ms var(--motion-ease),
+          box-shadow 620ms var(--motion-ease),
+          border-color 520ms var(--motion-ease),
+          transform 520ms var(--motion-ease);
+      }
+
+      .file-card:hover {
+        animation: pulse-glow 2200ms ease-in-out infinite;
+        box-shadow: 0 8px 26px var(--hover-glow), var(--shadow);
+      }
+
+      .file-card:hover .file-ring {
+        box-shadow: 0 0 0 7px var(--hover-glow-soft), 0 0 28px var(--hover-glow);
+      }
+
+      .file-card:has(.settings-toggle:hover) {
+        animation: none;
+        box-shadow: var(--shadow);
+      }
+
+      .file-card:has(.settings-toggle:hover) .file-ring {
+        box-shadow: none;
+        transform: none;
+      }
+
+      .top-chip:not(:disabled):hover,
+      #cancel:not(:disabled):hover,
+      #import:not(:disabled):hover,
+      .select-trigger:not(:disabled):hover,
+      .manual-toggle:not(:disabled):hover {
+        box-shadow: 0 7px 18px var(--hover-surface-shadow);
+      }
+
+      .actions {
+        transition: grid-template-columns 760ms var(--motion-morph), gap 520ms var(--motion-ease);
+      }
+
+      .actions button {
+        white-space: nowrap;
+        overflow: hidden;
+        transition:
+          width 760ms var(--motion-morph),
+          max-width 760ms var(--motion-morph),
+          background-color 480ms var(--motion-ease),
+          border-color 480ms var(--motion-ease),
+          color 280ms var(--motion-ease),
+          opacity 320ms var(--motion-ease),
+          transform 360ms var(--motion-ease),
+          box-shadow 420ms var(--motion-ease);
+      }
+
+      .actions.text-hidden button {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent !important;
+        text-shadow: none !important;
+      }
+
+      .import-confirm .actions:not(.morphing) #cancel,
+      .import-confirm .actions:not(.morphing) #import {
+        animation: action-label-in 420ms var(--motion-ease) both;
+      }
+
+      .shell.is-generating .file-ring .ring-progress-fill {
+        animation: ring-stroke-fill-smooth 2600ms linear forwards;
+      }
+
+      .shell.is-generating .file-ring svg:not(.ring-progress) {
+        animation: icon-focus 1900ms ease-in-out infinite alternate;
+      }
+
+      .shell.motion-success .file-ring {
+        animation: ring-pop-delight 1350ms var(--motion-snap);
+      }
+
+      .shell.motion-success .file-ring::after {
+        animation: ring-wave 1350ms ease-out forwards;
+      }
+
+      @keyframes ring-stroke-fill-smooth {
+        0% {
+          stroke-dashoffset: 100;
+        }
+        62% {
+          stroke-dashoffset: 38;
+        }
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes ring-pop-delight {
+        0% {
+          transform: scale(1);
+        }
+        38% {
+          transform: scale(1.13);
+        }
+        68% {
+          transform: scale(0.96);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes action-label-in {
+        0%,
+        42% {
+          color: transparent;
+        }
+        100% {
+          color: inherit;
+        }
+      }
+
+      .import-confirm .actions:not(.morphing) #cancel,
+      .import-confirm .actions:not(.morphing) #import {
+        animation: none !important;
+      }
+
+      .topbar {
+        justify-content: space-between !important;
+      }
+
+      .top-chip,
+      .clear-file {
+        min-height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 5px 9px;
+        border-radius: 18px;
+        color: var(--text);
+        background: var(--soft);
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 11px;
+        white-space: nowrap;
+      }
+
+      .clear-file {
+        min-width: 62px;
+        background: transparent;
+      }
+
+      .clear-file:disabled {
+        cursor: not-allowed;
+        opacity: 0.42;
+      }
+
+      .file-card {
+        min-height: 96px !important;
+        justify-content: center !important;
+        padding: 18px 20px 24px !important;
+        overflow: hidden !important;
+      }
+
+      .settings-open .file-card {
+        overflow: visible !important;
+      }
+
+      .settings-panel {
+        padding-bottom: 30px !important;
+      }
+
+      .settings-toggle {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 24px !important;
+        flex: none !important;
+        margin: 0 !important;
+        z-index: 8;
+      }
+
+      .settings-toggle::before {
+        top: 10px !important;
+        height: 3px !important;
+      }
+
+      .actions {
+        transition: grid-template-columns 520ms var(--motion-morph), gap 360ms var(--motion-ease) !important;
+      }
+
+      .actions button {
+        transition:
+          background-color 300ms var(--motion-ease),
+          border-color 300ms var(--motion-ease),
+          color 120ms var(--motion-ease),
+          opacity 180ms var(--motion-ease),
+          transform 300ms var(--motion-ease),
+          box-shadow 320ms var(--motion-ease) !important;
+        will-change: opacity, transform;
+      }
+
+      .import-confirm .actions:not(.morphing) #cancel,
+      .import-confirm .actions:not(.morphing) #import {
+        animation: action-label-in-fast 180ms var(--motion-ease) both !important;
+      }
+
+      .shell.is-generating .file-ring .ring-progress-fill {
+        animation: ring-stroke-fill-accelerate 1450ms cubic-bezier(0.48, 0, 0.12, 1) forwards !important;
+      }
+
+      .shell.is-generating .file-ring svg:not(.ring-progress) {
+        animation: icon-focus 1150ms ease-in-out infinite alternate !important;
+      }
+
+      .shell.motion-success .file-card {
+        animation: banner-success-pop 1120ms var(--motion-snap) both !important;
+      }
+
+      .shell.motion-success .file-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 6;
+        border-radius: inherit;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 48%, rgba(0, 201, 97, 0.22), transparent 36%),
+          linear-gradient(90deg, rgba(0, 201, 97, 0), rgba(0, 201, 97, 0.13), rgba(0, 201, 97, 0));
+        animation: banner-success-wash 1120ms ease-out both;
+      }
+
+      :root[data-theme="dark"] .shell.motion-success .file-card::after {
+        background:
+          radial-gradient(circle at 18% 48%, rgba(0, 255, 132, 0.28), transparent 38%),
+          linear-gradient(90deg, rgba(0, 255, 132, 0), rgba(0, 255, 132, 0.18), rgba(0, 255, 132, 0));
+      }
+
+      @keyframes ring-stroke-fill-accelerate {
+        0% {
+          stroke-dashoffset: 100;
+        }
+        42% {
+          stroke-dashoffset: 70;
+        }
+        76% {
+          stroke-dashoffset: 26;
+        }
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes action-label-in-fast {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes banner-success-pop {
+        0% {
+          transform: translateY(0) scale(1);
+        }
+        34% {
+          transform: translateY(-1px) scale(1.012);
+        }
+        68% {
+          transform: translateY(0) scale(0.996);
+        }
+        100% {
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes banner-success-wash {
+        0% {
+          opacity: 0;
+          transform: translateX(-18%);
+        }
+        24% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(18%);
+        }
+      }
+
+      #top-theme-toggle {
+        cursor: default;
+      }
+
+      .shell {
+        gap: 8px !important;
+        padding-bottom: 8px !important;
+      }
+
+      .content-stack {
+        gap: 8px !important;
+      }
+
+      .file-card {
+        min-height: 92px !important;
+        padding: 16px 20px 22px !important;
+        overflow: hidden !important;
+        z-index: 1000;
+      }
+
+      .settings-open .file-card,
+      .file-card:has(.select-wrap.open) {
+        overflow: visible !important;
+      }
+
+      .settings-panel {
+        position: relative;
+        z-index: 30;
+        display: grid !important;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        gap: 8px !important;
+        padding-bottom: 0 !important;
+        pointer-events: none;
+        transition:
+          max-height 360ms var(--motion-ease),
+          opacity 220ms ease,
+          padding 360ms var(--motion-ease);
+      }
+
+      .settings-open .settings-panel {
+        max-height: 205px;
+        opacity: 1;
+        overflow: visible;
+        padding-bottom: 18px !important;
+        pointer-events: auto;
+      }
+
+      .settings-toggle {
+        bottom: 0 !important;
+        z-index: 2 !important;
+      }
+
+      .select-wrap {
+        z-index: 1;
+      }
+
+      .select-wrap.open {
+        z-index: 10000 !important;
+      }
+
+      .select-menu {
+        z-index: 10001 !important;
+      }
+
+      .actions {
+        position: relative !important;
+        display: block !important;
+        width: 100% !important;
+        height: 38px !important;
+        gap: 0 !important;
+        z-index: 0;
+        --action-half: calc((100% - 10px) / 2);
+        --action-full: calc(100% - 48px);
+      }
+
+      .actions button {
+        position: absolute !important;
+        top: 0 !important;
+        display: block !important;
+        height: 38px !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        will-change: transform, width, opacity;
+        transition:
+          transform 560ms cubic-bezier(0.2, 0, 0, 1),
+          width 560ms cubic-bezier(0.2, 0, 0, 1),
+          opacity 180ms ease,
+          background-color 240ms ease,
+          border-color 240ms ease,
+          color 160ms ease,
+          box-shadow 260ms ease !important;
+      }
+
+      #cancel {
+        left: 0 !important;
+        width: var(--action-half) !important;
+        transform: translateX(0);
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      #import {
+        left: 48px !important;
+        width: var(--action-half) !important;
+        transform: translateX(77px);
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      .import-confirm #cancel {
+        left: 0 !important;
+        width: 38px !important;
+        transform: translateX(0);
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+
+      .import-confirm #import {
+        width: var(--action-full) !important;
+        transform: translateX(0);
+      }
+
+      .ring-progress-fill {
+        animation: none !important;
+        transition: stroke-dashoffset 120ms linear;
+      }
+
+      .shell.is-generating .file-ring .ring-progress-fill {
+        animation: none !important;
+      }
+
+      .shell.motion-success .file-ring .ring-progress {
+        transition: none !important;
+        opacity: 0 !important;
+      }
+
+      .shell.motion-success .file-ring .ring-progress-fill {
+        stroke-dashoffset: 0 !important;
+      }
+
+      .shell.motion-success .file-ring::after {
+        opacity: 0 !important;
+        border: 0 !important;
+        animation: none !important;
+      }
+
+      .actions {
+        --action-half: calc((100% - 10px) / 2);
+        --action-full: calc(100% - 48px);
+      }
+
+      .actions button,
+      .actions button:not(:disabled):hover {
+        transform: none !important;
+      }
+
+      #cancel,
+      #import {
+        display: block !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
+      }
+
+      #cancel {
+        left: 0 !important;
+        right: auto !important;
+        width: var(--action-half) !important;
+      }
+
+      #import {
+        left: auto !important;
+        right: 0 !important;
+        width: var(--action-half) !important;
+      }
+
+      .import-confirm #cancel {
+        width: 38px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        font-size: 0 !important;
+      }
+
+      .import-confirm #import {
+        width: var(--action-full) !important;
+      }
+
+      .ring-progress-fill {
+        transition: none !important;
+      }
+
+      .shell.motion-success .file-ring .ring-progress {
+        opacity: 0 !important;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
       }
     </style>
   </head>
   <body>
-    <main class="shell">
-      <section class="content">
-        <div class="hero">
-          <div class="eyebrow">Figma 生成器</div>
-          <h1>逆向设计组件</h1>
-          <p>将网页采集数据生成可审计、可复制的 Figma 设计系统草稿。</p>
-        </div>
+    <main id="shell" class="shell">
+      <header class="topbar">
+        <button id="top-theme-toggle" class="top-chip" type="button" title="切换明暗主题">
+          <span>Figma 生成器</span><span class="mode-dot" aria-hidden="true"></span>
+        </button>
+        <button id="clear-file" class="clear-file" type="button" disabled>清空文件</button>
+      </header>
 
-        <section class="section">
-          <h2>导入数据</h2>
-          <div id="drop-zone" class="file-picker">
-            <div class="file-row">
-              <svg class="upload-icon" viewBox="0 0 34 34" fill="none" aria-hidden="true">
-                <path d="M9.5 23.5V26.5C9.5 28.1569 10.8431 29.5 12.5 29.5H21.5C23.1569 29.5 24.5 28.1569 24.5 26.5V23.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                <path d="M17 24V7.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                <path d="M11.5 13L17 7.5L22.5 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <section class="content-stack">
+        <section id="drop-zone" class="file-card" aria-label="切换明暗主题">
+          <div class="file-row">
+            <button id="theme-toggle" class="file-ring" type="button" title="切换明暗主题" aria-label="切换明暗主题">
+              <svg class="ring-progress" viewBox="0 0 48 48" aria-hidden="true">
+                <circle class="ring-progress-track" cx="24" cy="24" r="20.5"></circle>
+                <circle class="ring-progress-fill" cx="24" cy="24" r="20.5" pathLength="100"></circle>
               </svg>
-              <div class="file-copy">
-                <div class="file-title">选择采集数据文件（.uikit.json）</div>
-                <div id="file-name" class="file-name">或将文件拖拽到此处</div>
+              <svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <path d="M14 18.6667V4.66667M19.8333 10.5L14 4.66667L8.16665 10.5M5.83331 18.6667V22.1667C5.83331 22.8083 6.35831 23.3333 6.99998 23.3333H21C21.6416 23.3333 22.1666 22.8083 22.1666 22.1667V18.6667" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div id="file-copy" class="file-copy" role="button" tabindex="0">
+              <div id="file-title" class="file-title">选择采集的文件</div>
+              <div id="file-name" class="file-name">或将文件拖到此处</div>
+            </div>
+          </div>
+
+          <input id="file" type="file" accept=".json,application/json" hidden>
+          <button id="settings-toggle" class="settings-toggle" type="button" aria-label="展开生成选项" aria-expanded="false"></button>
+
+          <section id="settings-panel" class="settings-panel" inert>
+            <div class="field">
+              <label for="mode">生成内容</label>
+              <div class="select-wrap" data-select="mode">
+                <select id="mode" class="native-select" tabindex="-1" aria-hidden="true">
+                  <option value="designer" selected>设计系统草稿（推荐）</option>
+                  <option value="library">组件库草稿</option>
+                  <option value="replica">页面截图参考</option>
+                  <option value="audit">审阅草稿</option>
+                </select>
+                <button class="select-trigger" type="button" aria-expanded="false">
+                  <span class="select-label">设计系统草稿（推荐）</span>
+                  <svg class="chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="select-menu" role="listbox">
+                  <button class="select-option active" type="button" data-value="designer">设计系统草稿（推荐）</button>
+                  <button class="select-option" type="button" data-value="library">组件库草稿</button>
+                  <button class="select-option" type="button" data-value="replica">页面截图参考</button>
+                  <button class="select-option" type="button" data-value="audit">审阅草稿</button>
+                </div>
               </div>
             </div>
-            <input id="file" type="file" accept=".json,application/json" hidden>
-          </div>
-          <button id="toggle-manual" class="toggle" type="button">粘贴 JSON 文本</button>
-          <div id="manual" class="manual">
-            <label for="json">Normalized design-system JSON</label>
-            <textarea id="json" spellcheck="false"></textarea>
-          </div>
+            <div class="field">
+              <label for="language">输出语言</label>
+              <div class="select-wrap" data-select="language">
+                <select id="language" class="native-select" tabindex="-1" aria-hidden="true">
+                  <option value="zh" selected>中文</option>
+                  <option value="bilingual">中英双语</option>
+                  <option value="en">English</option>
+                </select>
+                <button class="select-trigger" type="button" aria-expanded="false">
+                  <span class="select-label">中文</span>
+                  <svg class="chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="select-menu" role="listbox">
+                  <button class="select-option active" type="button" data-value="zh">中文</button>
+                  <button class="select-option" type="button" data-value="bilingual">中英双语</button>
+                  <button class="select-option" type="button" data-value="en">English</button>
+                </div>
+              </div>
+            </div>
+            <button id="toggle-manual" class="manual-toggle" type="button">粘贴 JSON 文本</button>
+            <div id="manual" class="manual">
+              <textarea id="json" spellcheck="false" aria-label="JSON 文本"></textarea>
+            </div>
+          </section>
         </section>
 
-        <section class="section">
-          <div class="field">
-            <label for="mode">生成内容</label>
-            <div class="select-wrap" data-select="mode">
-              <select id="mode" class="native-select" tabindex="-1" aria-hidden="true">
-                <option value="designer" selected>设计系统草稿（推荐）</option>
-                <option value="library">组件库草稿</option>
-                <option value="replica">页面截图参考</option>
-                <option value="audit">审阅草稿</option>
-              </select>
-              <button class="select-trigger" type="button" aria-expanded="false">
-                <span class="select-label">设计系统草稿（推荐）</span>
-                <svg class="chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-              <div class="select-menu" role="listbox">
-                <button class="select-option active" type="button" data-value="designer">设计系统草稿（推荐）</button>
-                <button class="select-option" type="button" data-value="library">组件库草稿</button>
-                <button class="select-option" type="button" data-value="replica">页面截图参考</button>
-                <button class="select-option" type="button" data-value="audit">审阅草稿</button>
-              </div>
-            </div>
-            <p class="hint">将生成可审计、可复制的设计系统草稿，包含样式、组件与资源。</p>
-          </div>
-        </section>
-
-        <section class="section">
-          <div class="field">
-            <label for="language">输出语言</label>
-            <div class="select-wrap" data-select="language">
-              <select id="language" class="native-select" tabindex="-1" aria-hidden="true">
-                <option value="zh" selected>中文</option>
-                <option value="bilingual">中英双语</option>
-                <option value="en">English</option>
-              </select>
-              <button class="select-trigger" type="button" aria-expanded="false">
-                <span class="select-label">中文</span>
-                <svg class="chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-              <div class="select-menu" role="listbox">
-                <button class="select-option active" type="button" data-value="zh">中文</button>
-                <button class="select-option" type="button" data-value="bilingual">中英双语</button>
-                <button class="select-option" type="button" data-value="en">English</button>
-              </div>
-            </div>
-            <p class="hint">生成内容的界面语言与文案语言。</p>
-          </div>
-        </section>
+        <footer class="actions">
+          <button id="cancel" type="button">上传</button>
+          <button id="import" type="button">生成</button>
+        </footer>
       </section>
-
-      <div class="actions">
-        <button id="import">生成到 Figma</button>
-        <button id="cancel">取消</button>
-      </div>
     </main>
 
     <script>
+      const shell = document.getElementById("shell");
       const textarea = document.getElementById("json");
       const fileInput = document.getElementById("file");
       const fileName = document.getElementById("file-name");
+      const fileTitle = document.getElementById("file-title");
+      const fileCopy = document.getElementById("file-copy");
       const manual = document.getElementById("manual");
       const language = document.getElementById("language");
       const mode = document.getElementById("mode");
       const dropZone = document.getElementById("drop-zone");
+      const settingsPanel = document.getElementById("settings-panel");
+      const settingsToggle = document.getElementById("settings-toggle");
+      const importButton = document.getElementById("import");
+      const cancelButton = document.getElementById("cancel");
+      const clearFileButton = document.getElementById("clear-file");
+      const actions = document.querySelector(".actions");
+      const themeToggle = document.getElementById("theme-toggle");
+      const topThemeToggle = document.getElementById("top-theme-toggle");
+      let hasFile = false;
+      let importConfirm = false;
+      let themeTouched = false;
+      let themeCrossfadeTimer = null;
+      let ringMotionTimer = null;
+      let ringProgressFrame = null;
+      let actionMorphTimer = null;
+      let generateMotionStartedAt = 0;
+      const ACTION_MORPH_MS = 560;
+      const MIN_GENERATE_MOTION_MS = 650;
+      const RING_HOLD_TARGET = 78;
+      const RING_HOLD_MS = 1600;
+      const RING_COMPLETE_MS = 280;
 
-      dropZone.onclick = () => {
-        fileInput.click();
+      parent.postMessage({ pluginMessage: { type: "ui-ready" } }, "*");
+
+      function resizePanel(height) {
+        parent.postMessage({ pluginMessage: { type: "resize-ui", height } }, "*");
+      }
+
+      function setTheme(theme, persist) {
+        const next = theme === "dark" ? "dark" : "light";
+        if (persist) playThemeCrossfade();
+        document.documentElement.dataset.theme = next;
+        if (persist) {
+          themeTouched = true;
+          parent.postMessage({ pluginMessage: { type: "set-theme", theme: next } }, "*");
+        }
+      }
+
+      function playThemeCrossfade() {
+        const root = document.documentElement;
+        root.classList.remove("theme-crossfade");
+        void root.offsetWidth;
+        root.classList.add("theme-crossfade");
+        clearTimeout(themeCrossfadeTimer);
+        themeCrossfadeTimer = setTimeout(() => root.classList.remove("theme-crossfade"), 720);
+      }
+
+      function toggleTheme() {
+        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        setTheme(next, true);
+      }
+
+      themeToggle.onclick = (event) => {
+        event.stopPropagation();
+        toggleTheme();
+      };
+
+      topThemeToggle.onclick = (event) => {
+        event.stopPropagation();
+        toggleTheme();
+      };
+
+      window.onmessage = (event) => {
+        const message = event.data && event.data.pluginMessage;
+        if (message && message.type === "preferences" && !themeTouched) setTheme(message.theme);
+        if (message && message.type === "import-complete") finishGenerateMotion(true);
+        if (message && message.type === "import-error") finishGenerateMotion(false);
+      };
+
+      dropZone.onclick = (event) => {
+        if (event.target.closest("#file, #settings-toggle, #theme-toggle, #top-theme-toggle, .settings-panel, .select-menu, .select-trigger, #toggle-manual, textarea")) return;
+        toggleTheme();
+      };
+
+      fileCopy.onkeydown = (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          toggleTheme();
+        }
       };
 
       fileInput.onchange = () => {
         const file = fileInput.files && fileInput.files[0];
-        if (!file) return;
-        loadFile(file);
+        if (file) loadFile(file);
+      };
+
+      fileInput.onclick = (event) => {
+        event.stopPropagation();
       };
 
       dropZone.ondragover = (event) => {
         event.preventDefault();
-        dropZone.classList.add("dragover");
-      };
-
-      dropZone.ondragleave = () => {
-        dropZone.classList.remove("dragover");
       };
 
       dropZone.ondrop = (event) => {
         event.preventDefault();
-        dropZone.classList.remove("dragover");
         const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
         if (file) loadFile(file);
       };
 
-      document.getElementById("toggle-manual").onclick = () => {
-        manual.classList.toggle("open");
+      settingsToggle.onclick = (event) => {
+        event.stopPropagation();
+        const open = shell.classList.toggle("settings-open");
+        settingsPanel.inert = !open;
+        settingsToggle.setAttribute("aria-expanded", String(open));
+        resizePanel(open ? 342 : 188);
       };
 
-      document.getElementById("import").onclick = () => {
+      document.getElementById("toggle-manual").onclick = (event) => {
+        event.stopPropagation();
+        manual.classList.toggle("open");
+        resizePanel(manual.classList.contains("open") ? 440 : 360);
+      };
+
+      importButton.onclick = () => {
+        if (!textarea.value.trim()) {
+          fileInput.click();
+          return;
+        }
+        if (!importConfirm) {
+          setImportConfirm(true);
+          return;
+        }
+        startGenerateMotion();
         parent.postMessage({ pluginMessage: { type: "import", json: textarea.value, language: language.value, mode: mode.value } }, "*");
       };
 
-      document.getElementById("cancel").onclick = () => {
-        parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+      cancelButton.onclick = () => {
+        if (importConfirm) {
+          setImportConfirm(false);
+          return;
+        }
+        fileInput.click();
+      };
+
+      clearFileButton.onclick = () => {
+        if (!hasFile) return;
+        clearFile();
       };
 
       document.addEventListener("click", (event) => {
@@ -506,7 +1938,150 @@
         readFileAsText(file, (content) => {
           textarea.value = content;
           fileName.textContent = file.name;
+          fileTitle.textContent = "已选择采集文件";
+          hasFile = true;
+        shell.classList.add("has-file");
+        clearFileButton.disabled = false;
+        setImportConfirm(false);
+          resizePanel(shell.classList.contains("settings-open") ? 342 : 188);
         });
+      }
+
+      function setImportConfirm(enabled) {
+        playActionMorph(() => {
+          importConfirm = Boolean(enabled);
+          shell.classList.toggle("import-confirm", importConfirm);
+          importButton.textContent = importConfirm ? "确认生成" : "生成";
+        });
+      }
+
+      function playActionMorph(applyState) {
+        if (!actions) {
+          if (applyState) applyState();
+          return;
+        }
+        clearTimeout(actionMorphTimer);
+        actions.classList.add("morphing");
+        void actions.offsetWidth;
+        if (applyState) applyState();
+        actionMorphTimer = setTimeout(() => {
+          actions.classList.remove("morphing");
+        }, ACTION_MORPH_MS);
+      }
+
+      function startGenerateMotion() {
+        generateMotionStartedAt = performance.now();
+        shell.classList.add("is-generating");
+        startRingProgress(shell);
+        importButton.disabled = true;
+        cancelButton.disabled = true;
+      }
+
+      async function finishGenerateMotion(succeeded) {
+        const elapsed = performance.now() - generateMotionStartedAt;
+        if (elapsed < MIN_GENERATE_MOTION_MS) await delay(MIN_GENERATE_MOTION_MS - elapsed);
+        await finishRingProgress(shell, succeeded);
+        shell.classList.remove("is-generating");
+        importButton.disabled = false;
+        cancelButton.disabled = false;
+        playRingFeedback(succeeded ? "motion-success" : "motion-error");
+      }
+
+      function ringFill(root) {
+        return root ? root.querySelector(".ring-progress-fill") : null;
+      }
+
+      function setRingProgress(root, value, options = {}) {
+        const fill = ringFill(root);
+        if (!fill) return;
+        const progress = Math.max(0, Math.min(100, value));
+        if (options.reset) {
+          fill.style.transition = "none";
+          fill.style.strokeDashoffset = "100";
+          void fill.getBoundingClientRect();
+          fill.style.transition = "";
+        }
+        fill.style.strokeDashoffset = String(100 - progress);
+      }
+
+      function startRingProgress(root) {
+        cancelAnimationFrame(ringProgressFrame);
+        const startedAt = performance.now();
+        setRingProgress(root, 0, { reset: true });
+
+        const tick = (now) => {
+          if (!root || !root.classList.contains("is-generating")) return;
+          const ratio = Math.min(1, (now - startedAt) / RING_HOLD_MS);
+          const eased = 0.34 * ratio + 0.66 * ratio * ratio;
+          const progress = Math.min(RING_HOLD_TARGET, eased * RING_HOLD_TARGET);
+          setRingProgress(root, progress);
+          ringProgressFrame = requestAnimationFrame(tick);
+        };
+
+        ringProgressFrame = requestAnimationFrame(tick);
+      }
+
+      function finishRingProgress(root, succeeded) {
+        cancelAnimationFrame(ringProgressFrame);
+        const fill = ringFill(root);
+        if (!fill) return Promise.resolve();
+
+        if (!succeeded) {
+          setRingProgress(root, 0);
+          return Promise.resolve();
+        }
+
+        const startOffset = Number.parseFloat(fill.style.strokeDashoffset || "100");
+        const startProgress = Math.max(0, Math.min(100, 100 - startOffset));
+        const startedAt = performance.now();
+
+        return new Promise((resolve) => {
+          const tick = (now) => {
+            const ratio = Math.min(1, (now - startedAt) / RING_COMPLETE_MS);
+            const eased = 1 - Math.pow(1 - ratio, 3);
+            setRingProgress(root, startProgress + (100 - startProgress) * eased);
+            if (ratio < 1) {
+              ringProgressFrame = requestAnimationFrame(tick);
+            } else {
+              setRingProgress(root, 100);
+              resolve();
+            }
+          };
+          ringProgressFrame = requestAnimationFrame(tick);
+        });
+      }
+
+      function playRingFeedback(className) {
+        clearTimeout(ringMotionTimer);
+        shell.classList.remove("motion-success", "motion-error");
+        void shell.offsetWidth;
+        shell.classList.add(className);
+        ringMotionTimer = setTimeout(() => {
+          shell.classList.remove(className);
+        }, className === "motion-success" ? 1500 : 650);
+      }
+
+      function clearFile() {
+        fileInput.value = "";
+        textarea.value = "";
+        fileName.textContent = "或将文件拖到此处";
+        fileTitle.textContent = "选择采集的文件";
+        hasFile = false;
+        shell.classList.remove("has-file", "settings-open", "import-confirm");
+        importConfirm = false;
+        settingsPanel.inert = true;
+        settingsToggle.setAttribute("aria-expanded", "false");
+        manual.classList.remove("open");
+        importButton.textContent = "生成";
+        cancelButton.textContent = "上传";
+        importButton.disabled = false;
+        cancelButton.disabled = false;
+        clearFileButton.disabled = true;
+        resizePanel(188);
+      }
+
+      function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, Math.max(0, ms)));
       }
 
       function readFileAsText(file, callback) {
