@@ -1,4 +1,4 @@
-﻿figma.showUI(__html__, { width: 448, height: 570 });
+figma.showUI(__html__, { width: 260, height: 188 });
 
 let outputLanguage = "bilingual";
 let outputMode = "designer";
@@ -11,8 +11,26 @@ let cjkRegularFont = null;
 let cjkMediumFont = null;
 let cjkSemiBoldFont = null;
 const GENERATED_BY = "reverse-design-system";
+const UI_THEME_KEY = "reverse-design-system-ui-theme";
 
 figma.ui.onmessage = async (message) => {
+  if (message.type === "ui-ready") {
+    const theme = await figma.clientStorage.getAsync(UI_THEME_KEY);
+    figma.ui.postMessage({ type: "preferences", theme: theme === "dark" ? "dark" : "light" });
+    return;
+  }
+
+  if (message.type === "set-theme") {
+    await figma.clientStorage.setAsync(UI_THEME_KEY, message.theme === "dark" ? "dark" : "light");
+    return;
+  }
+
+  if (message.type === "resize-ui") {
+    const height = Math.max(188, Math.min(520, Number(message.height) || 188));
+    figma.ui.resize(260, height);
+    return;
+  }
+
   if (message.type === "cancel") {
     figma.closePlugin();
     return;
@@ -21,15 +39,24 @@ figma.ui.onmessage = async (message) => {
   if (message.type !== "import") return;
 
   try {
+    const importStartedAt = Date.now();
     const data = JSON.parse(message.json);
     outputLanguage = message.language || "bilingual";
     outputMode = message.mode || "designer";
     await importDesignSystem(data);
+    await delay(Math.max(0, 2600 - (Date.now() - importStartedAt)));
+    figma.ui.postMessage({ type: "import-complete" });
+    await delay(2100);
     figma.closePlugin(copy("imported"));
   } catch (error) {
+    figma.ui.postMessage({ type: "import-error", message: error.message || String(error) });
     figma.notify(error.message || String(error), { error: true });
   }
 };
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function importDesignSystem(data) {
   await figma.loadFontAsync({ family: "Inter", style: "Regular" });

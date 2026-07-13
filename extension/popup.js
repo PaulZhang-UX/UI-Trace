@@ -23,6 +23,13 @@ const saveLatestLabelButton = document.getElementById("save-latest-label");
 const cancelLatestLabelButton = document.getElementById("cancel-latest-label");
 const scopeSegmented = document.getElementById("scope-segmented");
 const scopeButtons = Array.from(document.querySelectorAll("[data-scope]"));
+const actionsEl = document.getElementById("actions");
+const captureBackButton = document.getElementById("capture-back");
+const exportConfirmButton = document.getElementById("export-confirm");
+const themeToggle = document.getElementById("theme-toggle");
+const modeLabel = document.getElementById("mode-label");
+const detailsToggle = document.getElementById("details-toggle");
+const shellEl = document.querySelector(".shell");
 
 const LABEL_OPTIONS = [
   ["default", "默认状态"],
@@ -36,6 +43,7 @@ const LABEL_OPTIONS = [
   ["screenshot-full-page", "完整页面截图"]
 ];
 const SESSION_KEY = "reverseDesignSystemSession";
+const THEME_KEY = "reverseDesignSystemTheme";
 const REPLICA_SCREENSHOT_FORMAT = "jpeg";
 const REPLICA_SCREENSHOT_QUALITY = 92;
 const MAX_REPLICA_SCREENSHOT_HEIGHT = 12000;
@@ -45,15 +53,42 @@ let labelDropdown = null;
 let labelTrigger = null;
 let labelTriggerText = null;
 let labelOptionsPanel = null;
+let isAdvancedMode = false;
+let themeCrossfadeTimer = null;
+let ringMotionTimer = null;
+let ringProgressFrame = null;
+let actionMorphTimer = null;
+let detailsOpen = false;
+const ACTION_MORPH_MS = 560;
+const MIN_RING_MOTION_MS = 650;
+const RING_HOLD_TARGET = 78;
+const RING_HOLD_MS = 1600;
+const RING_COMPLETE_MS = 280;
 
 setupLabelDropdown();
 init();
 
 advancedToggle.addEventListener("click", () => {
-  advanced.classList.toggle("open");
-  const isOpen = advanced.classList.contains("open");
-  advancedToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-  if (advancedPanel) advancedPanel.inert = !isOpen;
+  setAdvancedMode(!isAdvancedMode);
+});
+
+captureBackButton.addEventListener("click", () => resetActionConfirmation());
+exportConfirmButton.addEventListener("click", () => resetActionConfirmation());
+themeToggle.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleTheme();
+});
+if (detailsToggle) {
+  detailsToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleDetailsPanel();
+  });
+}
+sessionCard.addEventListener("click", (event) => {
+  if (event.target.closest("button, select, .label-editor, .advanced-panel")) return;
+  if (event.target.closest(".session-overview")) {
+    toggleTheme();
+  }
 });
 
 for (const button of scopeButtons) {
@@ -78,7 +113,7 @@ saveLatestLabelButton.addEventListener("click", async () => {
   const label = latestLabelSelect.value || "default";
   const session = await readSession();
   if (!session.length) {
-    closeLabelEditor();
+    setDetailsPanel(false);
     updateSessionStatus(session);
     return;
   }
@@ -87,13 +122,13 @@ saveLatestLabelButton.addEventListener("click", async () => {
   latest.source.captureStateLabel = label;
   latest.source.captureStateLabelSource = "manual";
   await writeSession(session);
-  closeLabelEditor();
+  setDetailsPanel(false);
   statusEl.textContent = `已更新最新状态标签：${displayCaptureLabel(label)}。`;
   updateSessionStatus(session);
 });
 
 cancelLatestLabelButton.addEventListener("click", () => {
-  closeLabelEditor();
+  setDetailsPanel(false);
 });
 
 clearSessionButton.addEventListener("click", async () => {
@@ -115,6 +150,14 @@ clearSessionButton.addEventListener("click", async () => {
 });
 
 captureButton.addEventListener("click", async () => {
+  if (actionsEl && actionsEl.classList.contains("export-confirm")) {
+    resetActionConfirmation();
+    return;
+  }
+  if (captureButton.dataset.confirm !== "true") {
+    enterCaptureConfirmation();
+    return;
+  }
   await withBusy(captureButton, "正在采集当前页面...", async () => {
     const payload = await extractCurrentPage();
     const session = await readSession();
@@ -122,7 +165,8 @@ captureButton.addEventListener("click", async () => {
     await writeSession(session);
     statusEl.textContent = `已采集当前页面，标签：${displayCaptureLabel(payload.source && payload.source.captureStateLabel)}。`;
     updateSessionStatus(session);
-  });
+  }, { ring: true });
+  resetActionConfirmation();
 });
 
 captureInteractiveButton.addEventListener("click", async () => {
@@ -133,7 +177,7 @@ captureInteractiveButton.addEventListener("click", async () => {
     await writeSession(session);
     statusEl.textContent = `已采集 ${payloads.length} 个可见交互状态。`;
     updateSessionStatus(session);
-  });
+  }, { ring: true });
 });
 
 captureReplicaButton.addEventListener("click", async () => {
@@ -149,7 +193,7 @@ captureReplicaButton.addEventListener("click", async () => {
     const visualCount = payload.pageSnapshot && payload.pageSnapshot.visualReferences ? payload.pageSnapshot.visualReferences.length : 0;
     statusEl.textContent = `已采集截图参考：${nodeCount} 个追踪节点，${visualCount} 张截图。`;
     updateSessionStatus(session);
-  });
+  }, { ring: true });
 });
 
 exportSessionButton.addEventListener("click", async () => {
@@ -163,6 +207,18 @@ exportSessionButton.addEventListener("click", async () => {
 });
 
 exportNormalizedButton.addEventListener("click", async () => {
+  if (actionsEl && actionsEl.classList.contains("capture-confirm")) {
+    resetActionConfirmation();
+    return;
+  }
+  if (exportNormalizedButton.dataset.confirm !== "true") {
+    enterExportConfirmation();
+    return;
+  }
+  await exportNormalizedConfirmed();
+});
+
+async function exportNormalizedConfirmed() {
   await withBusy(exportNormalizedButton, "正在导出规范化 JSON...", async () => {
     const session = await readSession();
     if (!session.length) throw new Error("No captured states in this session.");
@@ -174,27 +230,239 @@ exportNormalizedButton.addEventListener("click", async () => {
     await downloadJson(normalized, normalizedFilename(merged));
     statusEl.textContent = `已导出 ${session.length} 个状态的规范化 JSON。`;
   });
-});
+  resetActionConfirmation();
+}
 
 async function init() {
-  const session = await readSession();
+  const stored = await chrome.storage.local.get([SESSION_KEY, THEME_KEY]);
+  applyTheme(stored[THEME_KEY] || "light");
+  setAdvancedMode(false);
+  const session = Array.isArray(stored[SESSION_KEY]) ? stored[SESSION_KEY] : [];
   updateSessionStatus(session);
 }
 
-async function withBusy(button, message, task) {
-  const buttons = [captureButton, captureInteractiveButton, captureReplicaButton, exportSessionButton, exportNormalizedButton, clearSessionButton, editLatestLabelButton].filter(Boolean);
+function setAdvancedMode(enabled) {
+  isAdvancedMode = Boolean(enabled);
+  if (advanced) advanced.classList.toggle("is-advanced", isAdvancedMode);
+  if (modeLabel) modeLabel.textContent = isAdvancedMode ? "Web 高级" : "Web 标准";
+  if (advancedToggle) advancedToggle.setAttribute("aria-expanded", isAdvancedMode ? "true" : "false");
+  setDetailsPanel(false);
+}
+
+function toggleDetailsPanel() {
+  if (sessionCard && sessionCard.classList.contains("empty")) return;
+  setDetailsPanel(!detailsOpen);
+}
+
+function setDetailsPanel(open) {
+  detailsOpen = Boolean(open);
+  if (sessionCard && sessionCard.classList.contains("empty")) detailsOpen = false;
+  if (sessionCard) sessionCard.classList.toggle("expanded", detailsOpen);
+  if (advanced) advanced.classList.toggle("expanded", detailsOpen && isAdvancedMode);
+  if (detailsToggle) detailsToggle.setAttribute("aria-expanded", detailsOpen ? "true" : "false");
+  if (advancedPanel) advancedPanel.inert = !(detailsOpen && isAdvancedMode);
+
+  if (detailsOpen) {
+    openLabelEditor();
+  } else {
+    closeLabelEditor();
+  }
+}
+
+function enterCaptureConfirmation() {
+  playActionMorph(() => {
+    applyDefaultActionState();
+    captureButton.dataset.confirm = "true";
+    captureButton.textContent = "采集当前界面";
+    exportNormalizedButton.dataset.confirm = "back";
+    exportNormalizedButton.textContent = "‹";
+    exportNormalizedButton.setAttribute("aria-label", "取消采集确认");
+    captureButton.setAttribute("aria-label", "采集当前界面");
+    if (actionsEl) actionsEl.classList.add("capture-confirm");
+  });
+}
+
+function enterExportConfirmation() {
+  playActionMorph(() => {
+    applyDefaultActionState();
+    exportNormalizedButton.dataset.confirm = "true";
+    exportNormalizedButton.textContent = "导出所有界面";
+    captureButton.dataset.confirm = "back";
+    captureButton.textContent = "›";
+    captureButton.setAttribute("aria-label", "取消导出确认");
+    exportNormalizedButton.setAttribute("aria-label", "导出所有界面");
+    if (actionsEl) actionsEl.classList.add("export-confirm");
+  });
+}
+
+function resetActionConfirmation() {
+  const hadConfirmation = actionsEl && (actionsEl.classList.contains("capture-confirm") || actionsEl.classList.contains("export-confirm"));
+  if (hadConfirmation) {
+    playActionMorph(applyDefaultActionState);
+    return;
+  }
+  applyDefaultActionState();
+}
+
+function applyDefaultActionState() {
+  captureButton.dataset.confirm = "false";
+  exportNormalizedButton.dataset.confirm = "false";
+  captureButton.textContent = "采集";
+  exportNormalizedButton.textContent = "导出";
+  captureButton.removeAttribute("aria-label");
+  exportNormalizedButton.removeAttribute("aria-label");
+  if (actionsEl) actionsEl.classList.remove("capture-confirm", "export-confirm");
+}
+
+function playActionMorph(applyState) {
+  if (!actionsEl) {
+    if (applyState) applyState();
+    return;
+  }
+  clearTimeout(actionMorphTimer);
+  actionsEl.classList.add("morphing");
+  void actionsEl.offsetWidth;
+  if (applyState) applyState();
+  actionMorphTimer = setTimeout(() => {
+    actionsEl.classList.remove("morphing");
+  }, ACTION_MORPH_MS);
+}
+
+async function toggleTheme() {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(next, { animate: true });
+  await chrome.storage.local.set({ [THEME_KEY]: next });
+}
+
+function applyTheme(theme, options = {}) {
+  const next = theme === "dark" ? "dark" : "light";
+  if (options.animate) playThemeCrossfade();
+  document.documentElement.dataset.theme = next;
+}
+
+function playThemeCrossfade() {
+  const root = document.documentElement;
+  root.classList.remove("theme-crossfade");
+  void root.offsetWidth;
+  root.classList.add("theme-crossfade");
+  clearTimeout(themeCrossfadeTimer);
+  themeCrossfadeTimer = setTimeout(() => root.classList.remove("theme-crossfade"), 720);
+}
+
+async function withBusy(button, message, task, options = {}) {
+  const buttons = [captureButton, captureBackButton, captureInteractiveButton, captureReplicaButton, exportSessionButton, exportNormalizedButton, exportConfirmButton, clearSessionButton, editLatestLabelButton].filter(Boolean);
   for (const item of buttons) item.disabled = true;
   statusEl.textContent = message;
+  const useRingMotion = options.ring && sessionCard;
+  const ringStartedAt = useRingMotion ? performance.now() : 0;
+  let succeeded = false;
+  if (useRingMotion) {
+    setRingBusy(true);
+    startRingProgress(sessionCard);
+  }
 
   try {
     await task();
+    succeeded = true;
   } catch (error) {
     statusEl.textContent = error.message || String(error);
   } finally {
+    if (useRingMotion) {
+      const elapsed = performance.now() - ringStartedAt;
+      if (elapsed < MIN_RING_MOTION_MS) await delay(MIN_RING_MOTION_MS - elapsed);
+      await finishRingProgress(sessionCard, succeeded);
+      setRingBusy(false);
+      playRingFeedback(succeeded ? "motion-success" : "motion-error");
+    }
     for (const item of buttons) item.disabled = false;
     const session = await readSession();
     updateSessionStatus(session);
   }
+  return succeeded;
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, Math.max(0, ms)));
+}
+
+function setRingBusy(enabled) {
+  if (!sessionCard) return;
+  sessionCard.classList.toggle("is-collecting", Boolean(enabled));
+}
+
+function ringFill(root) {
+  return root ? root.querySelector(".ring-progress-fill") : null;
+}
+
+function setRingProgress(root, value, options = {}) {
+  const fill = ringFill(root);
+  if (!fill) return;
+  const progress = Math.max(0, Math.min(100, value));
+  if (options.reset) {
+    fill.style.transition = "none";
+    fill.style.strokeDashoffset = "100";
+    void fill.getBoundingClientRect();
+    fill.style.transition = "";
+  }
+  fill.style.strokeDashoffset = String(100 - progress);
+}
+
+function startRingProgress(root) {
+  cancelAnimationFrame(ringProgressFrame);
+  const startedAt = performance.now();
+  setRingProgress(root, 0, { reset: true });
+
+  const tick = (now) => {
+    if (!root || !root.classList.contains("is-collecting")) return;
+    const ratio = Math.min(1, (now - startedAt) / RING_HOLD_MS);
+    const eased = 0.34 * ratio + 0.66 * ratio * ratio;
+    const progress = Math.min(RING_HOLD_TARGET, eased * RING_HOLD_TARGET);
+    setRingProgress(root, progress);
+    ringProgressFrame = requestAnimationFrame(tick);
+  };
+
+  ringProgressFrame = requestAnimationFrame(tick);
+}
+
+function finishRingProgress(root, succeeded) {
+  cancelAnimationFrame(ringProgressFrame);
+  const fill = ringFill(root);
+  if (!fill) return Promise.resolve();
+
+  if (!succeeded) {
+    setRingProgress(root, 0);
+    return Promise.resolve();
+  }
+
+  const startOffset = Number.parseFloat(fill.style.strokeDashoffset || "100");
+  const startProgress = Math.max(0, Math.min(100, 100 - startOffset));
+  const startedAt = performance.now();
+
+  return new Promise((resolve) => {
+    const tick = (now) => {
+      const ratio = Math.min(1, (now - startedAt) / RING_COMPLETE_MS);
+      const eased = 1 - Math.pow(1 - ratio, 3);
+      setRingProgress(root, startProgress + (100 - startProgress) * eased);
+      if (ratio < 1) {
+        ringProgressFrame = requestAnimationFrame(tick);
+      } else {
+        setRingProgress(root, 100);
+        resolve();
+      }
+    };
+    ringProgressFrame = requestAnimationFrame(tick);
+  });
+}
+
+function playRingFeedback(className) {
+  if (!sessionCard) return;
+  clearTimeout(ringMotionTimer);
+  sessionCard.classList.remove("motion-success", "motion-error");
+  void sessionCard.offsetWidth;
+  sessionCard.classList.add(className);
+  ringMotionTimer = setTimeout(() => {
+    sessionCard.classList.remove(className);
+  }, className === "motion-success" ? 1500 : 650);
 }
 
 async function extractCurrentPage(captureStateLabel, options = {}) {
@@ -601,11 +869,12 @@ function updateSessionStatus(session) {
   if (!session.length) {
     if (sessionCard) sessionCard.classList.add("empty");
     sessionCountEl.textContent = "尚未采集";
-    sessionHostEl.textContent = "打开网页后点击采集当前页面";
-    sessionLatestEl.textContent = "最新：-";
+    sessionHostEl.textContent = "打开网页后点击采集";
+    sessionLatestEl.textContent = "当前：--";
     if (latestSeparatorEl) latestSeparatorEl.style.display = "none";
     if (editLatestLabelButton) editLatestLabelButton.disabled = true;
-    closeLabelEditor();
+    if (detailsToggle) detailsToggle.disabled = true;
+    setDetailsPanel(false);
     exportNormalizedButton.disabled = true;
     exportSessionButton.disabled = true;
     clearSessionButton.disabled = true;
@@ -615,11 +884,12 @@ function updateSessionStatus(session) {
   const host = session[0].source && session[0].source.hostname ? session[0].source.hostname : "site";
   const latest = session[session.length - 1];
   const latestLabel = latest && latest.source ? latest.source.captureStateLabel : "";
-  sessionCountEl.textContent = `已采集 ${session.length} 个状态`;
+  sessionCountEl.textContent = `已采集${session.length}个界面`;
   sessionHostEl.textContent = host;
-  sessionLatestEl.textContent = `最新：${displayCaptureLabel(latestLabel)}`;
+  sessionLatestEl.textContent = `当前：${displayCaptureLabel(latestLabel)}`;
   if (latestSeparatorEl) latestSeparatorEl.style.display = "";
   if (editLatestLabelButton) editLatestLabelButton.disabled = false;
+  if (detailsToggle) detailsToggle.disabled = false;
   exportNormalizedButton.disabled = false;
   exportSessionButton.disabled = false;
   clearSessionButton.disabled = false;
@@ -687,8 +957,11 @@ function setupLabelDropdown() {
     const clickedDropdown = labelDropdown && labelDropdown.contains(event.target);
     const clickedEditor = labelEditor && labelEditor.contains(event.target);
     const clickedEditButton = editLatestLabelButton && editLatestLabelButton.contains(event.target);
+    const clickedAdvanced = advanced && advanced.contains(event.target);
+    const clickedModeToggle = advancedToggle && advancedToggle.contains(event.target);
+    const clickedDetailsToggle = detailsToggle && detailsToggle.contains(event.target);
     if (!clickedDropdown) closeLabelOptions();
-    if (!clickedEditor && !clickedEditButton) closeLabelEditor();
+    if (!clickedEditor && !clickedEditButton && !clickedAdvanced && !clickedModeToggle && !clickedDetailsToggle) setDetailsPanel(false);
   });
 
   document.addEventListener("keydown", (event) => {
@@ -763,7 +1036,7 @@ function displayCaptureLabel(label) {
 
 function resetClearConfirm() {
   clearSessionButton.dataset.confirm = "false";
-  if (clearLabel) clearLabel.textContent = "清空";
+  if (clearLabel) clearLabel.textContent = "清空采集";
   clearTimeout(clearConfirmTimer);
   clearConfirmTimer = null;
 }
